@@ -4,11 +4,14 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 
+import { formatMoney } from "@/lib/utils"
+
 interface RecentSalesProps {
   transactions: any[]
+  currency?: string
 }
 
-export function RecentSales({ transactions }: RecentSalesProps) {
+export function RecentSales({ transactions, currency = 'VND' }: RecentSalesProps) {
   return (
     <div className="space-y-8">
       {transactions.length === 0 && <div className="text-sm text-muted-foreground">Không có giao dịch gần đây</div>}
@@ -25,7 +28,7 @@ export function RecentSales({ transactions }: RecentSalesProps) {
             </p>
           </div>
           <div className={`ml-auto font-medium ${t.type === 'contribution' ? 'text-green-600' : 'text-red-600'}`}>
-            {t.type === 'contribution' ? '+' : '-'}${t.amount.toFixed(2)}
+            {t.type === 'contribution' ? '+' : '-'}{formatMoney(t.amount, currency)}
           </div>
         </div>
       ))}

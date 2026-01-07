@@ -9,14 +9,16 @@ import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle, Bell, Calendar, Search } from "lucide-react"
 import { markRecordAsPaid, sendReminders } from "@/app/(main)/funds/actions"
 import { toast } from "sonner"
+import { formatMoney } from "@/lib/utils"
 import { CreateMonthlyFundForm } from "./CreateMonthlyFundForm"
 
 interface Props {
   funds: any[]
   isAdmin: boolean
+  currency?: string
 }
 
-export function MonthlyFundsList({ funds, isAdmin }: Props) {
+export function MonthlyFundsList({ funds, isAdmin, currency = 'VND' }: Props) {
   const [searchTerm, setSearchTerm] = useState("")
 
   const handleMarkPaid = async (recordId: string) => {
@@ -31,7 +33,7 @@ export function MonthlyFundsList({ funds, isAdmin }: Props) {
     else toast.error(result?.message || "Có lỗi xảy ra")
   }
 
-  const filteredFunds = funds.filter(fund => 
+  const filteredFunds = funds.filter(fund =>
     fund.title.toLowerCase().includes(searchTerm.toLowerCase())
   )
 
@@ -40,7 +42,7 @@ export function MonthlyFundsList({ funds, isAdmin }: Props) {
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <h2 className="text-xl font-semibold">Thu quỹ hàng tháng</h2>
         <div className="flex items-center gap-2 w-full md:w-auto">
-           <div className="relative flex-1 md:w-64">
+          <div className="relative flex-1 md:w-64">
             <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Tìm kiếm quỹ..."
@@ -62,7 +64,7 @@ export function MonthlyFundsList({ funds, isAdmin }: Props) {
           const paidCount = fund.records.filter((r: any) => r.status === 'paid').length
           const totalCount = fund.records.length
           const progress = totalCount > 0 ? (paidCount / totalCount) * 100 : 0
-          
+
           return (
             <AccordionItem key={fund._id} value={fund._id} className="border rounded-lg px-4 bg-card">
               <AccordionTrigger className="hover:no-underline">
@@ -71,7 +73,7 @@ export function MonthlyFundsList({ funds, isAdmin }: Props) {
                     <div className="font-semibold">{fund.title}</div>
                     <div className="text-sm text-muted-foreground flex items-center gap-2">
                       <Calendar className="h-3 w-3" /> Hạn nộp: {new Date(fund.dueDate).toLocaleDateString('vi-VN')}
-                      <Badge variant="outline" className="ml-2">${fund.amount}</Badge>
+                      <Badge variant="outline" className="ml-2">{formatMoney(fund.amount, currency)}</Badge>
                     </div>
                   </div>
                   <div className="text-right">
@@ -91,7 +93,7 @@ export function MonthlyFundsList({ funds, isAdmin }: Props) {
                       </Button>
                     </div>
                   )}
-                  
+
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     {fund.records.map((record: any) => (
                       <div key={record._id} className="flex items-center justify-between p-3 border rounded-md bg-background">

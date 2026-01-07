@@ -26,7 +26,7 @@ export default async function SetupPage() {
     if (existing) return
     const hash = await bcrypt.hash(password, 10)
     await User.create({ name, email, passwordHash: hash, role: 'admin' })
-    redirect('/signin')
+    redirect('/setup/team')
   }
 
   return (

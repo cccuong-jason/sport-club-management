@@ -3,9 +3,11 @@ import { FundTransaction } from '@/models/FundTransaction'
 import { User } from '@/models/User'
 import { PaymentRequest } from '@/models/PaymentRequest'
 import { PaymentRecord } from '@/models/PaymentRecord'
+import { Team } from '@/models/Team'
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth-options'
 import { isAdmin } from '@/lib/rbac'
+import { formatMoney } from '@/lib/utils'
 import { AddTransactionForm } from '@/components/funds/AddTransactionForm'
 import { FundsTabs } from '@/components/funds/FundsTabs'
 import { MonthlyFundsList } from '@/components/funds/MonthlyFundsList'
@@ -35,10 +37,10 @@ async function listTransactions() {
 async function getMonthlyFunds() {
   await connectDB()
   const funds = await PaymentRequest.find({ type: 'monthly' }).sort({ dueDate: -1 }).lean<any>()
-  
+
   const fundsWithRecords = await Promise.all(funds.map(async (f: any) => {
     const records = await PaymentRecord.find({ requestId: f._id }).populate('userId', 'name').lean<any>()
-    
+
     // Serialize records
     const serializedRecords = records.map((r: any) => ({
       _id: r._id.toString(),
@@ -71,21 +73,21 @@ async function getMonthlyFunds() {
       records: serializedRecords
     }
   }))
-  
+
   return fundsWithRecords
 }
 
 async function getPenalties(userId?: string) {
   await connectDB()
   let query: any = { type: 'penalty' }
-  
+
   const requests = await PaymentRequest.find(query).sort({ createdAt: -1 }).lean<any>()
-  
+
   // For each penalty request, there should be one record (since we create them 1:1)
   // But we need to fetch the status from the record
   const penalties = await Promise.all(requests.map(async (req: any) => {
     const record = await PaymentRecord.findOne({ requestId: req._id }).populate('userId', 'name').lean<any>()
-    
+
     if (!record) return null
     if (userId && record.userId._id.toString() !== userId) return null
 
@@ -99,7 +101,7 @@ async function getPenalties(userId?: string) {
       status: record.status
     }
   }))
-  
+
   return penalties.filter(Boolean)
 }
 
@@ -140,14 +142,17 @@ export default async function FundsPage() {
   const monthlyFunds = await getMonthlyFunds()
   const penalties = await getPenalties(isUserAdmin ? undefined : userId)
 
+  const team = await Team.findOne({ memberIds: userId }).lean()
+  const currency = team?.currency || 'VND'
+
   const balance = items.reduce((acc: number, t: any) => acc + (t.type === 'contribution' ? t.amount : -t.amount), 0)
   const totalContributions = items.filter((t: any) => t.type === 'contribution').reduce((acc: number, t: any) => acc + t.amount, 0)
   const totalExpenses = items.filter((t: any) => t.type === 'expense').reduce((acc: number, t: any) => acc + t.amount, 0)
-  
+
   // Get current user's contributions
   const userContributions = items.filter((t: any) => t.type === 'contribution' && t.memberId?.toString() === userId)
   const userTotalContribution = userContributions.reduce((acc: number, t: any) => acc + t.amount, 0)
-  
+
   const Overview = (
     <div className="space-y-8">
       <div className="grid gap-4 md:grid-cols-3">
@@ -157,7 +162,7 @@ export default async function FundsPage() {
             <TrendingUp className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">${totalContributions.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-green-600">{formatMoney(totalContributions, currency)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -166,7 +171,7 @@ export default async function FundsPage() {
             <TrendingDown className="h-4 w-4 text-red-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</div>
+            <div className="text-2xl font-bold text-red-600">{formatMoney(totalExpenses, currency)}</div>
           </CardContent>
         </Card>
         <Card>
@@ -176,7 +181,7 @@ export default async function FundsPage() {
           </CardHeader>
           <CardContent>
             <div className={`text-2xl font-bold ${balance >= 0 ? 'text-green-600' : 'text-red-600'}`}>
-              ${balance.toFixed(2)}
+              {formatMoney(balance, currency)}
             </div>
           </CardContent>
         </Card>
@@ -192,14 +197,14 @@ export default async function FundsPage() {
             <div className="flex items-center justify-between mb-4">
               <div>
                 <div className="text-sm font-medium text-muted-foreground">Tổng đóng góp</div>
-                <div className="text-2xl font-bold text-green-600">${userTotalContribution.toFixed(2)}</div>
+                <div className="text-2xl font-bold text-green-600">{formatMoney(userTotalContribution, currency)}</div>
               </div>
               <div className="text-right">
                 <div className="text-sm font-medium text-muted-foreground">Số lần đóng góp</div>
                 <div className="text-2xl font-bold text-blue-600">{userContributions.length}</div>
               </div>
             </div>
-            
+
             {userContributions.length > 0 ? (
               <div className="space-y-2 max-h-48 overflow-y-auto">
                 {userContributions.slice(0, 5).map((t: any) => (
@@ -209,7 +214,7 @@ export default async function FundsPage() {
                       <div className="text-sm text-muted-foreground">{new Date(t.date).toLocaleDateString('vi-VN')}</div>
                     </div>
                     <div className="text-lg font-bold text-green-600">
-                      +${t.amount.toFixed(2)}
+                      +{formatMoney(t.amount, currency)}
                     </div>
                   </div>
                 ))}
@@ -253,10 +258,9 @@ export default async function FundsPage() {
                           {member && <span className="ml-1">• bởi {member.name}</span>}
                         </div>
                       </div>
-                      <div className={`text-lg font-bold ${
-                        t.type === 'contribution' ? 'text-green-600' : 'text-red-600'
-                      }`}>
-                        {t.type === 'contribution' ? '+' : '-'}${t.amount.toFixed(2)}
+                      <div className={`text-lg font-bold ${t.type === 'contribution' ? 'text-green-600' : 'text-red-600'
+                        }`}>
+                        {t.type === 'contribution' ? '+' : '-'}{formatMoney(t.amount, currency)}
                       </div>
                     </div>
                   )
@@ -280,12 +284,11 @@ export default async function FundsPage() {
                 memberContributions.slice(0, 5).map((contrib: any, index) => (
                   <div key={contrib._id} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm ${
-                        index === 0 ? 'bg-yellow-500' :
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-sm ${index === 0 ? 'bg-yellow-500' :
                         index === 1 ? 'bg-gray-400' :
-                        index === 2 ? 'bg-orange-500' :
-                        'bg-blue-500'
-                      }`}>
+                          index === 2 ? 'bg-orange-500' :
+                            'bg-blue-500'
+                        }`}>
                         {index + 1}
                       </div>
                       <div>
@@ -294,7 +297,7 @@ export default async function FundsPage() {
                       </div>
                     </div>
                     <div className="text-lg font-bold text-green-600">
-                      ${contrib.total.toFixed(2)}
+                      {formatMoney(contrib.total, currency)}
                     </div>
                   </div>
                 ))
@@ -313,10 +316,10 @@ export default async function FundsPage() {
         <p className="text-muted-foreground">Quản lý tài chính, quỹ hàng tháng và tiền phạt.</p>
       </div>
 
-      <FundsTabs 
+      <FundsTabs
         overview={Overview}
-        monthly={<MonthlyFundsList funds={monthlyFunds} isAdmin={isUserAdmin} />}
-        penalties={<PenaltiesList penalties={penalties} members={members} isAdmin={isUserAdmin} />}
+        monthly={<MonthlyFundsList funds={monthlyFunds} isAdmin={isUserAdmin} currency={currency} />}
+        penalties={<PenaltiesList penalties={penalties} members={members} isAdmin={isUserAdmin} currency={currency} />}
       />
     </main>
   )

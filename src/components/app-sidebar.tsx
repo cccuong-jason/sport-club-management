@@ -14,6 +14,7 @@ import {
   CreditCard,
   User
 } from "lucide-react"
+
 import { useSession, signOut } from "next-auth/react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
@@ -39,10 +40,24 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 
-export function AppSidebar() {
+import { FaFutbol, FaBasketballBall, FaVolleyballBall } from "react-icons/fa";
+import { GiShuttlecock } from "react-icons/gi";
+import { MdSportsTennis } from "react-icons/md";
+
+const SPORT_ICONS: Record<string, React.ElementType> = {
+  'Football': FaFutbol,
+  'Futsal': FaFutbol,
+  'Basketball': FaBasketballBall,
+  'Volleyball': FaVolleyballBall,
+  'Badminton': GiShuttlecock,
+  'Tennis': MdSportsTennis,
+  'Other': Trophy
+}
+
+export function AppSidebar({ team }: { team?: any }) {
   const { data: session } = useSession()
   const pathname = usePathname()
-  
+
   const items = [
     { title: "Bảng điều khiển", url: "/dashboard", icon: LayoutDashboard },
     { title: "Đội bóng", url: "/team", icon: Users },
@@ -60,17 +75,19 @@ export function AppSidebar() {
     return pathname?.startsWith(url)
   }
 
+  const SportIcon = (team?.sport && SPORT_ICONS[team.sport]) || Trophy
+
   return (
     <Sidebar>
       <SidebarHeader>
         <div className="flex items-center gap-2 px-2 py-3">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
-              <Trophy className="size-4" />
-            </div>
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">FC Management</span>
-              <span className="truncate text-xs">Hệ thống quản lý</span>
-            </div>
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+            <SportIcon className="size-4" />
+          </div>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <span className="truncate font-semibold">{team?.name || 'FC Management'}</span>
+            <span className="truncate text-xs">Hệ thống quản lý</span>
+          </div>
         </div>
       </SidebarHeader>
       <SidebarSeparator />
@@ -99,16 +116,16 @@ export function AppSidebar() {
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <SidebarMenuButton className="h-12">
-                   <Avatar className="h-8 w-8 rounded-lg">
-                      <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
-                      <AvatarFallback className="rounded-lg">
-                        {session?.user?.name?.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                        <span className="truncate font-semibold">{session?.user?.name}</span>
-                        <span className="truncate text-xs">{session?.user?.email}</span>
-                    </div>
+                  <Avatar className="h-8 w-8 rounded-lg">
+                    <AvatarImage src={session?.user?.image || ""} alt={session?.user?.name || ""} />
+                    <AvatarFallback className="rounded-lg">
+                      {session?.user?.name?.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-semibold">{session?.user?.name}</span>
+                    <span className="truncate text-xs">{session?.user?.email}</span>
+                  </div>
                   <ChevronUp className="ml-auto" />
                 </SidebarMenuButton>
               </DropdownMenuTrigger>

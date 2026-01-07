@@ -10,14 +10,16 @@ import { markRecordAsPaid } from "@/app/(main)/funds/actions"
 import { toast } from "sonner"
 import { AssignPenaltyForm } from "./AssignPenaltyForm"
 import { CheckCircle, Clock, Search } from "lucide-react"
+import { formatMoney } from "@/lib/utils"
 
 interface Props {
   penalties: any[]
   members: any[]
   isAdmin: boolean
+  currency?: string
 }
 
-export function PenaltiesList({ penalties, members, isAdmin }: Props) {
+export function PenaltiesList({ penalties, members, isAdmin, currency = 'VND' }: Props) {
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
 
@@ -28,11 +30,11 @@ export function PenaltiesList({ penalties, members, isAdmin }: Props) {
   }
 
   const filteredPenalties = penalties.filter(p => {
-    const matchesSearch = p.reason.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          p.userName.toLowerCase().includes(searchTerm.toLowerCase())
-    
+    const matchesSearch = p.reason.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      p.userName.toLowerCase().includes(searchTerm.toLowerCase())
+
     const matchesStatus = statusFilter === "all" || p.status === statusFilter
-    
+
     return matchesSearch && matchesStatus
   })
 
@@ -74,7 +76,7 @@ export function PenaltiesList({ penalties, members, isAdmin }: Props) {
                 <div>
                   <div className="font-semibold text-lg">{p.reason}</div>
                   <div className="text-muted-foreground">
-                    Phạt <span className="font-medium text-foreground">{p.userName}</span> • ${p.amount}
+                    Phạt <span className="font-medium text-foreground">{p.userName}</span> • {formatMoney(p.amount, currency)}
                   </div>
                   <div className="text-xs text-muted-foreground mt-1">
                     Ngày: {new Date(p.createdAt).toLocaleDateString('vi-VN')}

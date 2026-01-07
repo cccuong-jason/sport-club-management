@@ -6,11 +6,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: deps
     restart: always
     ports:
       - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    command: sh -c "npm run dev"
     environment:
-      - NODE_ENV=production
+      - NODE_ENV=development
       # Point to the local mongo container service
       - MONGODB_URI=mongodb://mongo:27017/football-club
     env_file:

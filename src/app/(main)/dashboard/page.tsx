@@ -6,6 +6,8 @@ import { Event } from '@/models/Event'
 import { User } from '@/models/User'
 import { FundTransaction } from '@/models/FundTransaction'
 import { Attendance } from '@/models/Attendance'
+import { Team } from '@/models/Team'
+import { formatMoney } from '@/lib/utils'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Overview } from "@/components/dashboard/Overview"
@@ -19,10 +21,14 @@ export default async function DashboardPage() {
   await connectDB()
 
   // 1. Fetch Stats
+  const user = await User.findOne({ email: session.user.email }).select('_id').lean()
+  const team = await Team.findOne({ memberIds: user?._id }).select('currency').lean()
+  const currency = team?.currency || 'VND'
+
   const usersCount = await User.countDocuments()
   const fundTxns = await FundTransaction.find().lean<any>()
   const balance = fundTxns.reduce((acc: number, t: any) => acc + (t.type === 'contribution' ? t.amount : -t.amount), 0)
-  
+
   // 2. Fetch Attendance for Chart
   // Get last 5 events
   const recentEvents = await Event.find({ date: { $lte: new Date() } })
@@ -77,7 +83,7 @@ export default async function DashboardPage() {
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${balance.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatMoney(balance, currency)}</div>
                 <p className="text-xs text-muted-foreground">
                   +20.1% so với tháng trước
                 </p>
@@ -144,7 +150,7 @@ export default async function DashboardPage() {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <RecentSales transactions={recentTransactions} />
+                <RecentSales transactions={recentTransactions} currency={currency} />
               </CardContent>
             </Card>
           </div>

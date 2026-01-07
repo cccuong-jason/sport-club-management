@@ -15,11 +15,34 @@ import {
 } from "@/components/ui/breadcrumb"
 
 import { NotificationCenter } from "@/components/notifications/NotificationCenter"
+import { getServerSession } from "next-auth"
+import { authOptions } from "@/lib/auth-options"
+import { connectDB } from "@/lib/db"
+import { User } from "@/models/User"
+import { Team } from "@/models/Team"
+import { redirect } from "next/navigation"
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  const session = await getServerSession(authOptions)
+  let team = null
+
+  if (session?.user?.email) {
+    await connectDB()
+    const user = await User.findOne({ email: session.user.email }).lean()
+
+    if (user) {
+      // Check if user is part of any team (as manager or member)
+      team = await Team.findOne({ memberIds: user._id }).lean()
+
+      if (user.role === 'admin' && !team) {
+        redirect('/setup/team')
+      }
+    }
+  }
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar team={team} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 bg-background sticky top-0 z-10">
           <div className="flex items-center gap-2">
