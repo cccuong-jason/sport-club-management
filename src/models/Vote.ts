@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const VoteSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   matchId: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
   voterId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   selectionsEnc: { type: String, required: true },

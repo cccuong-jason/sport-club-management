@@ -2,8 +2,7 @@ import { connectDB } from '@/lib/db'
 import { Vote } from '@/models/Vote'
 import { Event } from '@/models/Event'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { decryptSelections } from '@/lib/crypto'
 import { tallyVotes, sortWithTiebreakers } from '@/lib/scoring'
@@ -16,8 +15,8 @@ import { Medal, Eye, EyeOff } from 'lucide-react'
 
 export default async function VotingPage(props: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await props.params
-  const session = await getServerSession(authOptions)
-  if (!session) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
   await connectDB()
   const event = await Event.findById(matchId).lean<any>()
   if (!event) return <main className="p-6">Invalid event</main>
@@ -27,7 +26,7 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
     createdAt: u.createdAt?.toISOString(),
     updatedAt: u.updatedAt?.toISOString()
   })))
-  const voter = await User.findOne({ email: session.user?.email }).lean<any>().then((u: any) => u ? ({
+  const voter = await User.findOne({ clerkId: authUser.clerkId }).lean<any>().then((u: any) => u ? ({
     ...u,
     _id: u._id.toString(),
     createdAt: u.createdAt?.toISOString(),
@@ -35,20 +34,20 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
   }) : null)
 
   const hasVoted = voter ? await Vote.exists({ matchId, voterId: voter._id }) : false
-  const isUserAdmin = isAdmin((session as any).role)
+  const isUserAdmin = isAdmin(authUser.role)
 
   async function computeResults() {
     'use server'
     await connectDB()
     const votes = await Vote.find({ matchId }).lean<any>()
-    const decoded: Array<{ playerId: string, placement: 1|2|3 }> = []
+    const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
     for (const v of votes) {
       try {
         const obj = JSON.parse(decryptSelections(v.selectionsEnc))
         if (obj.first) decoded.push({ playerId: obj.first, placement: 1 })
         if (obj.second) decoded.push({ playerId: obj.second, placement: 2 })
         if (obj.third) decoded.push({ playerId: obj.third, placement: 3 })
-      } catch {}
+      } catch { }
     }
     const tallied = tallyVotes(decoded)
     return sortWithTiebreakers(tallied)
@@ -56,18 +55,18 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
 
   async function getAdminDetailedVotes() {
     'use server'
-    const session = await getServerSession(authOptions)
-    if (!isAdmin((session as any)?.role)) return null
-    
+    const authUser = await getAuthUser()
+    if (!isAdmin(authUser?.role)) return null
+
     await connectDB()
     const votes = await Vote.find({ matchId }).populate('voterId', 'name email').lean<any>()
-    
+
     return votes.map((v: any) => {
       let selections = { first: '', second: '', third: '' }
       try {
         selections = JSON.parse(decryptSelections(v.selectionsEnc))
-      } catch {}
-      
+      } catch { }
+
       return {
         _id: v._id.toString(),
         voterName: v.voterId?.name || 'Unknown',
@@ -140,12 +139,11 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
                 {results.map((r: any, index) => (
                   <div key={r.playerId} className="flex items-center justify-between p-4 rounded-lg border hover:bg-muted/50 transition-colors">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${
-                        index === 0 ? 'bg-yellow-500' :
-                        index === 1 ? 'bg-gray-400' :
-                        index === 2 ? 'bg-orange-600' :
-                        'bg-slate-400'
-                      }`}>
+                      <div className={`w-8 h-8 rounded-full flex items-center justify-center text-white font-bold shadow-sm ${index === 0 ? 'bg-yellow-500' :
+                          index === 1 ? 'bg-gray-400' :
+                            index === 2 ? 'bg-orange-600' :
+                              'bg-slate-400'
+                        }`}>
                         {index < 3 ? <Medal className="h-4 w-4" /> : index + 1}
                       </div>
                       <div>
@@ -174,7 +172,7 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
         <Card className="border-red-200">
           <CardHeader className="bg-red-50/50">
             <CardTitle className="text-red-900 flex items-center gap-2">
-              <Eye className="h-5 w-5" /> 
+              <Eye className="h-5 w-5" />
               Admin View: Detailed Ballots
             </CardTitle>
             <CardDescription className="text-red-700">
@@ -187,7 +185,7 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
                 const p1 = members.find((m: any) => String(m._id) === vote.selections.first)?.name || 'Unknown'
                 const p2 = members.find((m: any) => String(m._id) === vote.selections.second)?.name || 'Unknown'
                 const p3 = members.find((m: any) => String(m._id) === vote.selections.third)?.name || 'Unknown'
-                
+
                 return (
                   <div key={vote._id} className="p-4 rounded-lg border bg-muted/20">
                     <div className="flex items-center justify-between mb-2">

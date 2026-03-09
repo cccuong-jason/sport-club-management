@@ -3,19 +3,18 @@
 import { connectDB } from '@/lib/db'
 import { Event } from '@/models/Event'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { EventSchema } from '@/lib/validators'
 import { createNotification } from '@/lib/notifications'
 
 export async function createEvent(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
   const input = {
     title: String(formData.get('title') || ''),
-    type: String(formData.get('type') || 'training') as 'training'|'match',
+    type: String(formData.get('type') || 'training') as 'training' | 'match',
     date: String(formData.get('date') || ''),
     startTime: String(formData.get('startTime') || ''),
     endTime: String(formData.get('endTime') || ''),
@@ -23,12 +22,12 @@ export async function createEvent(formData: FormData) {
   }
   let seasonId = String(formData.get('seasonId') || '')
   if (seasonId === 'none') seasonId = ''
-  
+
   const parsed = EventSchema.safeParse(input)
   if (!parsed.success) return { success: false, message: 'Invalid event data' }
-  
+
   await connectDB()
-  
+
   try {
     const event = await Event.create({
       ...parsed.data,
@@ -37,7 +36,7 @@ export async function createEvent(formData: FormData) {
       seasonId: seasonId || null,
       createdBy: null
     })
-    
+
     // Send In-App Notification
     try {
       await createNotification(
@@ -49,7 +48,7 @@ export async function createEvent(formData: FormData) {
     } catch (error) {
       console.error('Failed to send notifications:', error)
     }
-    
+
     revalidatePath('/events')
     return { success: true, message: 'Event created successfully' }
   } catch (error) {

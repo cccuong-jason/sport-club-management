@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const PaymentRecordSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   requestId: { type: Schema.Types.ObjectId, ref: 'PaymentRequest', required: true },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   amount: { type: Number, required: true }, // Snapshot of amount due

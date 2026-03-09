@@ -1,5 +1,4 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { redirect } from 'next/navigation'
 import { connectDB } from '@/lib/db'
 import { Event } from '@/models/Event'
@@ -14,15 +13,15 @@ import { CalendarDays, DollarSign, Users, Activity } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 
 export default async function DashboardPage() {
-  const session = await getServerSession(authOptions)
-  if (!session) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
   await connectDB()
 
   // 1. Fetch Stats
   const usersCount = await User.countDocuments()
   const fundTxns = await FundTransaction.find().lean<any>()
   const balance = fundTxns.reduce((acc: number, t: any) => acc + (t.type === 'contribution' ? t.amount : -t.amount), 0)
-  
+
   // 2. Fetch Attendance for Chart
   // Get last 5 events
   const recentEvents = await Event.find({ date: { $lte: new Date() } })

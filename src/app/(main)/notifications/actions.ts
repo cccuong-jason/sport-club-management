@@ -2,17 +2,16 @@
 
 import { connectDB } from '@/lib/db'
 import { Notification } from '@/models/Notification'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { User } from '@/models/User'
 import { revalidatePath } from 'next/cache'
 
 export async function getNotifications() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.email) return []
-  
+  const authUser = await getAuthUser()
+  if (!authUser) return []
+
   await connectDB()
-  const user = await User.findOne({ email: session.user.email })
+  const user = await User.findOne({ clerkId: authUser.clerkId })
   if (!user) return []
 
   const notifications = await Notification.find({ recipientId: user._id })
@@ -30,20 +29,20 @@ export async function getNotifications() {
 }
 
 export async function markAsRead(notificationId: string) {
-  const session = await getServerSession(authOptions)
-  if (!session) return
-  
+  const authUser = await getAuthUser()
+  if (!authUser) return
+
   await connectDB()
   await Notification.findByIdAndUpdate(notificationId, { read: true })
   revalidatePath('/notifications') // Optional, mostly client-side state update
 }
 
 export async function markAllAsRead() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.email) return
-  
+  const authUser = await getAuthUser()
+  if (!authUser) return
+
   await connectDB()
-  const user = await User.findOne({ email: session.user.email })
+  const user = await User.findOne({ clerkId: authUser.clerkId })
   if (!user) return
 
   await Notification.updateMany(

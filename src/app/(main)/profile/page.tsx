@@ -1,17 +1,16 @@
 import { connectDB } from '@/lib/db'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { redirect } from 'next/navigation'
 import { ProfileForm } from '@/components/profile/ProfileForm'
 
 export default async function ProfilePage() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.email) redirect('/signin')
-  
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
+
   await connectDB()
-  const user = await User.findOne({ email: session.user.email }).lean<any>()
-  
+  const user = await User.findOne({ clerkId: authUser.clerkId }).lean<any>()
+
   if (!user) return <div>User not found</div>
 
   const serializedUser = {

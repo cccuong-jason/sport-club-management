@@ -1,7 +1,6 @@
 import { connectDB } from '@/lib/db'
 import { Season } from '@/models/Season'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { User } from '@/models/User'
@@ -20,7 +19,7 @@ async function listSeasons() {
 }
 
 export default async function SeasonsPage() {
-  const session = await getServerSession(authOptions)
+  const authUser = await getAuthUser()
   const seasons = await listSeasons()
   return (
     <main className="space-y-8">
@@ -28,9 +27,9 @@ export default async function SeasonsPage() {
         <h1 className="text-3xl font-bold tracking-tight">Seasons</h1>
         <p className="text-muted-foreground">Manage competitive seasons and view historical leaderboards.</p>
       </div>
-      
-      {isAdmin((session as any)?.role) && <CreateSeasonForm />}
-      
+
+      {isAdmin(authUser?.role) && <CreateSeasonForm />}
+
       <div className="grid grid-cols-1 gap-6">
         {seasons.map((s: any) => (
           <SeasonRow key={s._id} season={s} />
@@ -48,8 +47,8 @@ export default async function SeasonsPage() {
 function CreateSeasonForm() {
   async function create(formData: FormData) {
     'use server'
-    const session = await getServerSession(authOptions)
-    if (!isAdmin((session as any).role)) return
+    const authUser = await getAuthUser()
+    if (!isAdmin(authUser?.role)) return
     await connectDB()
     const name = String(formData.get('name') || '')
     const startDate = new Date(String(formData.get('startDate') || ''))
@@ -91,14 +90,14 @@ async function computeLeaderboard(from: Date, to: Date) {
   await connectDB()
   const users = await User.find().lean<any>()
   const votes = await Vote.find().lean<any>()
-  const decoded: Array<{ playerId: string, placement: 1|2|3 }> = []
+  const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
   for (const v of votes) {
     try {
       const d = JSON.parse(decryptSelections(v.selectionsEnc))
       decoded.push({ playerId: d.first, placement: 1 })
       decoded.push({ playerId: d.second, placement: 2 })
       decoded.push({ playerId: d.third, placement: 3 })
-    } catch {}
+    } catch { }
   }
   const voteTallies = tallyVotes(decoded)
   const attendance = await Attendance.find().lean<any>()
@@ -110,7 +109,7 @@ async function computeLeaderboard(from: Date, to: Date) {
     const id = String(a.userId)
     attendanceTallies[id] = (attendanceTallies[id] || 0) + attendancePoint(a.status)
   }
-  
+
   const combined = voteTallies.map(v => ({
     playerId: v.playerId,
     total: v.total + (attendanceTallies[v.playerId] ? attendanceTallies[v.playerId] / 4 : 0),
@@ -120,16 +119,16 @@ async function computeLeaderboard(from: Date, to: Date) {
     mvpPoints: v.total,
     attendancePoints: attendanceTallies[v.playerId] || 0
   }))
-  
+
   for (const u of users) {
     const id = String(u._id)
     if (!combined.find(c => c.playerId === id)) {
-      combined.push({ 
-        playerId: id, 
-        total: attendanceTallies[id] ? attendanceTallies[id] / 4 : 0, 
-        firsts: 0, seconds: 0, thirds: 0, 
-        mvpPoints: 0, 
-        attendancePoints: attendanceTallies[id] || 0 
+      combined.push({
+        playerId: id,
+        total: attendanceTallies[id] ? attendanceTallies[id] / 4 : 0,
+        firsts: 0, seconds: 0, thirds: 0,
+        mvpPoints: 0,
+        attendancePoints: attendanceTallies[id] || 0
       })
     }
   }

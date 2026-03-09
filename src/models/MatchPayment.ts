@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const MatchPaymentSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   matchId: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   amount: { type: Number, required: true },

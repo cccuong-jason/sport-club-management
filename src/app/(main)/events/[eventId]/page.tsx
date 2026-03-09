@@ -2,20 +2,19 @@ import { connectDB } from '@/lib/db'
 import { Event } from '@/models/Event'
 import { RSVP } from '@/models/RSVP'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export default async function EventDetail(props: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await props.params
-  const session = await getServerSession(authOptions)
-  if (!session) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
   await connectDB()
   const event = await Event.findById(eventId).lean<any>()
   if (!event) return <main className="p-6">Event not found</main>
-  
-  const user = await User.findOne({ email: session.user?.email }).lean<any>()
+
+  const user = await User.findOne({ clerkId: authUser.clerkId }).lean<any>()
   const myRsvp = user ? await RSVP.findOne({ eventId, userId: user._id }).lean<any>() : null
   const allRsvps = await RSVP.find({ eventId }).lean<any>()
   const rsvpCounts = {
@@ -26,12 +25,11 @@ export default async function EventDetail(props: { params: Promise<{ eventId: st
 
   async function rsvp(formData: FormData) {
     'use server'
-    const session = await getServerSession(authOptions)
-    if (!session?.user?.email) return
+    const authUser = await getAuthUser()
+    if (!authUser?.clerkId) return
     await connectDB()
-    const status = String(formData.get('status') || 'maybe') as 'yes'|'no'|'maybe'
-    const userEmail = session.user.email as string
-    const user = await (await import('@/models/User')).User.findOne({ email: userEmail })
+    const status = String(formData.get('status') || 'maybe') as 'yes' | 'no' | 'maybe'
+    const user = await (await import('@/models/User')).User.findOne({ clerkId: authUser.clerkId })
     if (!user) return
     await RSVP.updateOne({ eventId, userId: user._id }, { status }, { upsert: true })
     revalidatePath(`/events/${eventId}`)
@@ -58,7 +56,7 @@ export default async function EventDetail(props: { params: Promise<{ eventId: st
             <div className="text-xs text-gray-500">Going</div>
           </div>
         </div>
-        
+
         {(event.startTime || event.endTime) && (
           <div className="mt-4 p-3 bg-gray-50 rounded-lg">
             <div className="text-sm text-gray-600">
@@ -76,17 +74,16 @@ export default async function EventDetail(props: { params: Promise<{ eventId: st
             <div className="space-y-4">
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                 <span className="font-medium">Current Status:</span>
-                <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                  myRsvp.status === 'yes' ? 'bg-green-100 text-green-800' :
-                  myRsvp.status === 'no' ? 'bg-red-100 text-red-800' :
-                  'bg-yellow-100 text-yellow-800'
-                }`}>
-                  {myRsvp.status === 'yes' ? '✅ Going' : 
-                   myRsvp.status === 'no' ? '❌ Not Going' : 
-                   '⚠️ Maybe'}
+                <span className={`px-3 py-1 rounded-full text-sm font-medium ${myRsvp.status === 'yes' ? 'bg-green-100 text-green-800' :
+                    myRsvp.status === 'no' ? 'bg-red-100 text-red-800' :
+                      'bg-yellow-100 text-yellow-800'
+                  }`}>
+                  {myRsvp.status === 'yes' ? '✅ Going' :
+                    myRsvp.status === 'no' ? '❌ Not Going' :
+                      '⚠️ Maybe'}
                 </span>
               </div>
-              
+
               <form action={rsvp} className="space-y-3">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">Change your response:</label>

@@ -2,17 +2,19 @@ version: '3.8'
 
 services:
   app:
-    container_name: football-club-app
+    container_name: sport-club-app
     build:
       context: .
       dockerfile: Dockerfile
     restart: always
     ports:
       - "3000:3000"
-    environment:
-      - NODE_ENV=production
-      # Point to the local mongo container service
-      - MONGODB_URI=mongodb://mongo:27017/football-club
+    # environment:
+    #   - NODE_ENV=dev
+    #   # Point to the local mongo container service
+    #   - MONGODB_URI=mongodb://mongo:27017/football-club
+    #   - NEXTAUTH_SECRET=test
+    #   - NEXTAUTH_URL=http://localhost:3000
     env_file:
       - .env.local
     depends_on:

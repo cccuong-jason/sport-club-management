@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const EventSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   type: { type: String, enum: ['training', 'match'], required: true },
   title: { type: String, required: true },
   date: { type: Date, required: true },

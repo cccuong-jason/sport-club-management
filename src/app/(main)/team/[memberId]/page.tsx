@@ -1,23 +1,22 @@
 import { connectDB } from '@/lib/db'
 import { User, IUser } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { notFound, redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 export default async function MemberProfile(props: { params: Promise<{ memberId: string }> }) {
   const { memberId } = await props.params
-  const session = await getServerSession(authOptions)
-  if (!session) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
   await connectDB()
   const member = await User.findById(memberId).lean<IUser>()
   if (!member) return notFound()
-  const canEdit = isAdmin((session as any).role)
+  const canEdit = isAdmin(authUser?.role)
   async function updateMember(formData: FormData) {
     'use server'
-    const session = await getServerSession(authOptions)
-    if (!isAdmin((session as any).role)) return
+    const authUser = await getAuthUser()
+    if (!isAdmin(authUser?.role)) return
     await connectDB()
     const position = String(formData.get('position') || '')
     const phoneNumber = String(formData.get('phoneNumber') || '')
@@ -28,7 +27,7 @@ export default async function MemberProfile(props: { params: Promise<{ memberId:
     <main className="space-y-6">
       <h1 className="text-2xl font-semibold">Member Profile</h1>
       <div className="rounded-lg border bg-white p-4 shadow-sm">
-        <div className="font-medium">{member.name} <span className="ml-2 rounded bg-gray-100 px-2 py-0.5 text-xs text-gray-700">{member.role}</span></div>
+        <div className="font-medium">{member.name}</div>
         <div className="text-sm text-gray-600">{member.email}</div>
         <div className="text-sm text-gray-600">{member.position || '-'}</div>
         <div className="text-sm text-gray-600">{member.phoneNumber || '-'}</div>
