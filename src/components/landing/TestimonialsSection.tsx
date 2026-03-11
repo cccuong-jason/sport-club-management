@@ -31,35 +31,38 @@ const testimonials = [
 
 export function TestimonialsSection() {
     return (
-        <section className="bg-white py-24 sm:py-32 border-t border-slate-100">
+        <section className="bg-zinc-950 py-24 sm:py-32 border-t border-zinc-900">
             <div className="container mx-auto px-6 lg:px-8">
 
-                <div className="mx-auto max-w-xl text-center mb-16">
-                    <h2 className="text-3xl font-bold tracking-tight text-slate-900 sm:text-4xl font-heading">
-                        Built for the love of the game.
+                <div className="mx-auto max-w-2xl text-center mb-20">
+                    <h2 className="text-sm font-bold leading-7 text-primary font-heading uppercase tracking-[0.2em] mb-4">
+                        Player Feedback
                     </h2>
+                    <p className="mt-2 text-4xl font-black tracking-tighter text-white sm:text-6xl font-heading uppercase">
+                        Built for the game.
+                    </p>
                 </div>
 
                 <div className="mx-auto grid max-w-2xl grid-cols-1 lg:mx-0 lg:max-w-none lg:grid-cols-3 gap-8">
                     {testimonials.map((testimonial, i) => (
                         <motion.div
                             key={testimonial.author.name}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ duration: 0.4, delay: i * 0.15 }}
-                            className="flex flex-col justify-between bg-slate-50 rounded-2xl p-8 border border-green-100 shadow-sm hover:shadow-md transition-shadow duration-200"
+                            initial={{ opacity: 0, y: 40, scale: 0.95 }}
+                            whileInView={{ opacity: 1, y: 0, scale: 1 }}
+                            viewport={{ once: true, margin: "-50px" }}
+                            transition={{ duration: 0.6, type: "spring", bounce: 0.4, delay: i * 0.15 }}
+                            className="flex flex-col justify-between bg-zinc-900 rounded-none p-10 border border-zinc-800 shadow-xl hover:border-primary/30 transition-colors duration-300"
                         >
-                            <p className="text-lg leading-relaxed text-slate-700 font-sans italic mb-8">
+                            <p className="text-lg leading-relaxed text-zinc-300 font-sans italic mb-10">
                                 "{testimonial.body}"
                             </p>
-                            <div className="flex items-center gap-x-4 mt-auto">
-                                <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold font-heading border border-primary/20">
+                            <div className="flex items-center gap-x-5 mt-auto pt-6 border-t border-zinc-800/50">
+                                <div className="h-14 w-14 rounded-none bg-zinc-950 flex items-center justify-center text-primary font-black font-heading border border-zinc-800">
                                     {testimonial.author.initials}
                                 </div>
                                 <div>
-                                    <div className="font-semibold text-slate-900 font-heading">{testimonial.author.name}</div>
-                                    <div className="text-sm text-slate-500 font-sans">{testimonial.author.role}</div>
+                                    <div className="font-bold text-white tracking-wide font-heading uppercase">{testimonial.author.name}</div>
+                                    <div className="text-sm text-zinc-500 font-sans tracking-wider uppercase mt-1">{testimonial.author.role}</div>
                                 </div>
                             </div>
                         </motion.div>
