@@ -4,26 +4,28 @@ import { useRef, useState, useEffect } from 'react'
 import { motion, useMotionValue, useSpring, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
 
-// Tailored to the Club Management System capabilities
-const capabilities = [
-    {
-        title: "ATTENDANCE",
-        description: "Never chase players on WhatsApp again. Automated RSVPs, instant squad views, and strict cutoffs to ensure you always have numbers."
-    },
-    {
-        title: "FINANCES",
-        description: "Total transparency on match fees and club dues. Track who paid, who owes, and manage the seasonal budget without the headache."
-    },
-    {
-        title: "STATISTICS",
-        description: "Vote for MVP, track goalscorers, and analyze attendance reliability. Build a culture of performance and accountability."
-    }
-]
+import { useTranslations } from 'next-intl'
 
 export function CapabilitiesSection() {
+    const t = useTranslations('Landing.Capabilities')
     const containerRef = useRef<HTMLDivElement>(null)
     const [hoveredIndex, setHoveredIndex] = useState<number | null>(null)
     const [isHoveringSection, setIsHoveringSection] = useState(false)
+
+    const capabilities = [
+        {
+            title: t('items.attendance.title'),
+            description: t('items.attendance.description')
+        },
+        {
+            title: t('items.finances.title'),
+            description: t('items.finances.description')
+        },
+        {
+            title: t('items.statistics.title'),
+            description: t('items.statistics.description')
+        }
+    ]
 
     // Cursor tracking state
     const mouseX = useMotionValue(0)
@@ -52,8 +54,9 @@ export function CapabilitiesSection() {
 
     return (
         <section
+            id="capabilities"
             ref={containerRef}
-            className="bg-zinc-950 py-32 sm:py-48 relative border-t border-zinc-900 border-b overflow-hidden cursor-none" // Hide default cursor when inside
+            className="bg-white dark:bg-zinc-950 py-32 sm:py-48 relative border-t border-zinc-200 dark:border-zinc-900 border-b overflow-hidden cursor-none" // Hide default cursor when inside
             onMouseEnter={() => setIsHoveringSection(true)}
             onMouseLeave={() => {
                 setIsHoveringSection(false)
@@ -62,9 +65,8 @@ export function CapabilitiesSection() {
         >
             <div className="container mx-auto px-6 lg:px-8 relative z-10">
                 <div className="text-center mb-24">
-                    <p className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-400 font-heading max-w-2xl mx-auto leading-relaxed">
-                        Our management infrastructure automates the admin work, <br className="hidden sm:block" />
-                        so you can focus entirely on the match.
+                    <p className="text-sm font-bold uppercase tracking-[0.2em] text-zinc-500 dark:text-zinc-400 font-heading max-w-2xl mx-auto leading-relaxed">
+                        {t('description1')} <br className="hidden sm:block" /> {t('description2')}
                     </p>
                 </div>
 
@@ -84,7 +86,7 @@ export function CapabilitiesSection() {
                                 <motion.h2
                                     className={`text-[12vw] sm:text-[10vw] font-black uppercase tracking-tighter font-heading leading-[0.85] transition-all duration-500 ease-out inline-block
                                         ${isHovered ? 'text-primary drop-shadow-[0_0_30px_rgba(209,242,209,0.3)]' :
-                                            isOtherHovered ? 'text-zinc-900 blur-[2px]' : 'text-zinc-200'}
+                                            isOtherHovered ? 'text-zinc-200 dark:text-zinc-900 blur-[2px]' : 'text-zinc-800 dark:text-zinc-200'}
                                     `}
                                 >
                                     {item.title}
@@ -100,7 +102,7 @@ export function CapabilitiesSection() {
                                             transition={{ duration: 0.3 }}
                                             className="absolute left-1/2 -translate-x-1/2 top-1/2 -translate-y-1/2 w-full max-w-md pointer-events-none"
                                         >
-                                            <p className="text-white text-lg sm:text-2xl font-bold p-6 bg-zinc-950/80 backdrop-blur-xl border border-zinc-800 shadow-2xl leading-relaxed tracking-wide font-sans">
+                                            <p className="text-zinc-900 dark:text-white text-lg sm:text-2xl font-bold p-6 bg-white/80 dark:bg-zinc-950/80 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 shadow-2xl leading-relaxed tracking-wide font-sans">
                                                 {item.description}
                                             </p>
                                         </motion.div>
@@ -127,7 +129,7 @@ export function CapabilitiesSection() {
                         className="fixed top-0 left-0 w-[120px] h-[40px] bg-primary rounded-full flex items-center justify-center gap-1 z-50 pointer-events-none shadow-[0_0_20px_rgba(209,242,209,0.4)]"
                     >
                         <span className="text-black text-[10px] font-black uppercase tracking-widest">
-                            View More
+                            {t('viewMore')}
                         </span>
                         <ArrowRight className="w-3 h-3 text-black" />
                     </motion.div>

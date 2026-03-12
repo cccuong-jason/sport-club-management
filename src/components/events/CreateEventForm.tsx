@@ -1,6 +1,6 @@
 'use client'
 
-import { createEvent } from '@/app/(main)/events/actions'
+import { createEvent } from '@/app/[locale]/(main)/events/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

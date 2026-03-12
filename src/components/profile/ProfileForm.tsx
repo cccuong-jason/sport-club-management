@@ -1,6 +1,6 @@
 'use client'
 
-import { updateProfile } from '@/app/(main)/profile/actions'
+import { updateProfile } from '@/app/[locale]/(main)/profile/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

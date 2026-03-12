@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { markRecordAsPaid } from "@/app/(main)/funds/actions"
+import { markRecordAsPaid } from "@/app/[locale]/(main)/funds/actions"
 import { toast } from "sonner"
 import { AssignPenaltyForm } from "./AssignPenaltyForm"
 import { CheckCircle, Clock, Search } from "lucide-react"

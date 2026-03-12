@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { CheckCircle, XCircle, Bell, Calendar, Search } from "lucide-react"
-import { markRecordAsPaid, sendReminders } from "@/app/(main)/funds/actions"
+import { markRecordAsPaid, sendReminders } from "@/app/[locale]/(main)/funds/actions"
 import { toast } from "sonner"
 import { CreateMonthlyFundForm } from "./CreateMonthlyFundForm"
 

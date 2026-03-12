@@ -1,6 +1,6 @@
 'use client'
 
-import { assignPenalty } from '@/app/(main)/funds/actions'
+import { assignPenalty } from '@/app/[locale]/(main)/funds/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'

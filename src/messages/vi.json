@@ -1,0 +1,171 @@
+{
+    "Landing": {
+        "Header": {
+            "about": "Giới thiệu",
+            "features": "Tính Năng",
+            "howItWorks": "Cách Hoạt Động",
+            "testimonials": "Đánh Giá",
+            "dashboard": "Bảng điều khiển →",
+            "getStarted": "Bắt đầu →"
+        },
+        "Hero": {
+            "training": "HUẤN LUYỆN",
+            "develop": "PHÁT TRIỂN",
+            "manageYour": "Quản lý",
+            "squad": "Đội bóng.",
+            "description": "Trung tâm quản lý hiện đại, năng động được thiết kế cho các đội bóng hướng tới sự xuất sắc. Theo dõi điểm danh, nâng cao hiệu suất và duy trì tính kỷ luật một cách liên tục.",
+            "returnToDashboard": "TRỞ VỀ BẢNG ĐIỀU KHIỂN",
+            "getStartedFree": "BẮT ĐẦU MIỄN PHÍ",
+            "explore": "Khám phá",
+            "ticker": {
+                "alex": "ALEX ĐÃ THAM GIA",
+                "match": "TRẬN ĐẤU TỐI NAY 8:00PM",
+                "players": "12 CẦU THỦ XÁC NHẬN",
+                "dues": "ĐÓNG GÓP THÁNG: 85%",
+                "sarah": "SARAH LÀ MVP",
+                "payment": "Đã nhận thanh toán",
+                "updated": "Đã cập nhật phí trận đấu",
+                "next": "Trận đấu tiếp theo"
+            }
+        },
+        "SocialProof": {
+            "matches": "Trận đấu",
+            "players": "Cầu thủ",
+            "funds": "Quỹ quản lý"
+        },
+        "HowItWorks": {
+            "title": "Con đường rõ ràng ra sân",
+            "heading": "Cách Hoạt Động",
+            "description": "Chúng tôi xây dựng quá trình tham gia hoàn toàn dễ dàng. Kết nối và tổ chức toàn bộ đội bóng trước buổi tập tiếp theo của bạn.",
+            "steps": {
+                "step1": {
+                    "name": "Đăng Ký Miễn Phí",
+                    "description": "Tạo tài khoản trong vài giây nhanh chóng bằng email hoặc tài khoản Google của bạn."
+                },
+                "step2": {
+                    "name": "Tham Gia Câu Lạc Bộ",
+                    "description": "Tìm đội hiện tại của bạn hoặc tạo không gian câu lạc bộ hoàn toàn mới."
+                },
+                "step3": {
+                    "name": "Quản Lý Cùng Nhau",
+                    "description": "Theo dõi điểm danh, thu quỹ và tổ chức các sự kiện trong một trung tâm."
+                }
+            }
+        },
+        "Capabilities": {
+            "description1": "Hạ tầng quản lý của chúng tôi tự động hóa công việc hành chính,",
+            "description2": "để bạn có thể tập trung hoàn toàn vào trận đấu.",
+            "viewMore": "Xem Thêm",
+            "items": {
+                "attendance": {
+                    "title": "ĐIỂM DANH",
+                    "description": "Không bao giờ phải hối thúc cầu thủ trên Zalo/WhatsApp nữa. Nhắc nhở tự động để đảm bảo bạn luôn có đủ người."
+                },
+                "finances": {
+                    "title": "TÀI CHÍNH",
+                    "description": "Minh bạch hoàn toàn về phí trận đấu và đóng góp. Theo dõi ai đã thanh toán, ai còn nợ."
+                },
+                "statistics": {
+                    "title": "THỐNG KÊ",
+                    "description": "Bình chọn Cầu Thủ Xuất Sắc Nhất, theo dõi danh sách ghi bàn và phân tích mức độ tham gia."
+                }
+            }
+        },
+        "FeaturesDeepDive": {
+            "title": "Các Tính Năng Lõi",
+            "heading": "Tất Cả Những Gì Cần Thiết.",
+            "tabs": {
+                "events": {
+                    "title": "Sự Kiện & Lịch",
+                    "heading": "KHÔNG BAO GIỜ THIẾU NGƯỜI.",
+                    "content": "Lên lịch các trận đấu và buổi tập ngay lập tức. Cầu thủ trả lời chỉ bằng một thao tác. Gửi lời nhắc tự động cho những người quên."
+                },
+                "finance": {
+                    "title": "Tài Chính",
+                    "heading": "SỔ SÁCH MINH BẠCH.",
+                    "content": "Loại bỏ các bảng tính rườm rà. Theo dõi đóng góp của thành viên, hỗ trợ phí trận đấu trực tiếp qua tài khoản. Minh bạch cho toàn đội."
+                },
+                "team": {
+                    "title": "Quản Lý Đội",
+                    "heading": "ĐỘI BÓNG TRONG TÚI BẠN.",
+                    "content": "Giữ tất cả thông tin liên hệ của cầu thủ, vị trí ưa thích an toàn ở một nơi. Dễ dàng chỉ định năng lực Quản trị viên cho ban huấn luyện."
+                },
+                "performance": {
+                    "title": "Hiệu Suất",
+                    "heading": "VĂN HÓA THÀNH TÍCH.",
+                    "content": "Tự động theo dõi tỷ lệ tham dự trong suốt mùa giải. Bình chọn Cầu Thủ Của Trận Đấu và lưu giữ dữ liệu lịch sử để khen thưởng."
+                }
+            },
+            "mockups": {
+                "inOut": "12 CÓ / 2 VẮNG",
+                "pending": "CHỜ DUYỆT",
+                "out": "VẮNG",
+                "clubBalance": "Số Dư CLB"
+            }
+        },
+        "Showcases": {
+            "heading1": "Thành Quả",
+            "heading2": "Thực Tế.",
+            "description": "Hệ thống quản lý mang lại những cải thiện rõ rệt cho hiệu quả, sự tham gia và sức khỏe tài chính của câu lạc bộ.",
+            "items": {
+                "attendance": {
+                    "title": "TỶ LỆ THAM GIA",
+                    "description": "Các câu lạc bộ báo cáo khả năng kiểm soát hoàn hảo về những người có mặt trong ngày thi đấu."
+                },
+                "time": {
+                    "title": "THỜI GIAN TIẾT KIỆM",
+                    "description": "Thời gian trung bình tiết kiệm mỗi tuần của các nhà quản lý nhờ cắt giảm việc chạy theo tin nhắn."
+                },
+                "finance": {
+                    "title": "THU HỒI PHÍ",
+                    "description": "Sự gia tăng trong việc thu hồi phí trận đấu thông qua sổ cái kỹ thuật số minh bạch."
+                }
+            }
+        },
+        "Testimonials": {
+            "title": "Đánh giá từ cầu thủ",
+            "heading": "Dành cho sân cỏ.",
+            "items": {
+                "1": {
+                    "body": "Ứng dụng này đã thay đổi cách chúng tôi điều hành. Chúng tôi từng phải chạy theo mọi người trên nhóm chat để thu tiền và điểm danh. Bây giờ nó hoàn toàn tự động.",
+                    "author": "Minh T.",
+                    "role": "Quản Lý CLB"
+                },
+                "2": {
+                    "body": "Cuối cùng cũng có một giao diện sạch sẽ cho thể thao nghiệp dư. Nó trông chuyên nghiệp và các cầu thủ của chúng tôi thực sự thích kiểm tra ứng dụng.",
+                    "author": "Hoàng Yến",
+                    "role": "Đội Trưởng"
+                },
+                "3": {
+                    "body": "Chỉ riêng việc theo dõi tài chính thôi đã đáng giá rồi. Biết chính xác ai đã trả phí trận đấu và ngân sách sân bóng còn lại là bao nhiêu giúp tôi tiết kiệm hàng giờ.",
+                    "author": "Thành Trần",
+                    "role": "Thủ Quỹ"
+                }
+            }
+        },
+        "FinalCta": {
+            "title1": "Đội bóng của bạn xứng đáng với",
+            "title2": "công cụ tốt hơn.",
+            "description": "Ngừng việc chạy theo để đòi tiền và điểm danh trên nhóm chat. Đưa toàn bộ đội bóng vào nề nếp và sẵn sàng thi đấu ngay hôm nay.",
+            "button": "BẮT ĐẦU MIỄN PHÍ",
+            "dashboard": "TRỞ VỀ BẢNG ĐIỀU KHIỂN"
+        },
+        "Footer": {
+            "sloganTop": "QUẢN LÝ ĐỘI BÓNG",
+            "sloganMain": "QUẢN LÝ ÍT HƠN. <br /> CHƠI NHIỀU HƠN.",
+            "ctaButton": "TẠO CÂU LẠC BỘ",
+            "quotes": {
+                "1": "\"ĐIỂM DANH TỰ ĐỘNG NGHĨA LÀ<br />KHÔNG CẦN NHẮC NHỞ.\"",
+                "2": "\"MINH BẠCH HOÀN TOÀN<br />VỀ PHÍ TRẬN ĐẤU.\"",
+                "3": "\"ĐỘI BÓNG LUÔN Ở<br />TRONG TÚI BẠN.\""
+            },
+            "nav": {
+                "features": "TÍNH NĂNG",
+                "howItWorks": "CÁCH HOẠT ĐỘNG",
+                "twitter": "TWITTER",
+                "support": "HỖ TRỢ"
+            },
+            "copyright": "©GOALZ. GIỮ TOÀN QUYỀN."
+        }
+    }
+}

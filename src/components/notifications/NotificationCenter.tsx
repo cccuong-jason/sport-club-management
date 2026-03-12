@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/popover'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { useEffect, useState } from 'react'
-import { getNotifications, markAsRead, markAllAsRead } from '@/app/(main)/notifications/actions'
+import { getNotifications, markAsRead, markAllAsRead } from '@/app/[locale]/(main)/notifications/actions'
 import { cn } from '@/lib/utils'
 import Link from 'next/link'
 import { formatDistanceToNow } from 'date-fns'

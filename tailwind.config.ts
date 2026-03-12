@@ -63,7 +63,7 @@ export default {
 			},
 			fontFamily: {
 				sans: ['var(--font-work-sans)', 'sans-serif'],
-				heading: ['var(--font-outfit)', 'sans-serif'],
+				heading: ['var(--font-anton)', 'sans-serif'],
 			},
 			borderRadius: {
 				lg: 'var(--radius)',

@@ -2,44 +2,48 @@
 
 import { motion } from 'framer-motion'
 
-const testimonials = [
-    {
-        body: "This app transformed how we run Sunday League. We used to chase people down on WhatsApp for subs and attendance. Now it's completely automated.",
-        author: {
-            name: "Marcus T.",
-            role: "Club Manager",
-            initials: "MT"
-        }
-    },
-    {
-        body: "Finally, a clean interface for amateur sports. It looks professional, and our players actually enjoy checking the app to see who is coming to training.",
-        author: {
-            name: "Sarah Jenkins",
-            role: "Team Captain",
-            initials: "SJ"
-        }
-    },
-    {
-        body: "The finance tracking alone makes it worth it. Knowing exactly who has paid match fees and what our remaining pitch budget is saves me hours of headache.",
-        author: {
-            name: "David Chen",
-            role: "Treasurer",
-            initials: "DC"
-        }
-    }
-]
+import { useTranslations } from 'next-intl'
 
 export function TestimonialsSection() {
+    const t = useTranslations('Landing.Testimonials')
+
+    const testimonials = [
+        {
+            body: t('items.1.body'),
+            author: {
+                name: t('items.1.author'),
+                role: t('items.1.role'),
+                initials: "MT"
+            }
+        },
+        {
+            body: t('items.2.body'),
+            author: {
+                name: t('items.2.author'),
+                role: t('items.2.role'),
+                initials: "SJ"
+            }
+        },
+        {
+            body: t('items.3.body'),
+            author: {
+                name: t('items.3.author'),
+                role: t('items.3.role'),
+                initials: "DC"
+            }
+        }
+    ]
+
     return (
-        <section className="bg-zinc-950 py-24 sm:py-32 border-t border-zinc-900">
+        <section id="testimonials" className="bg-zinc-50 dark:bg-zinc-950 py-24 sm:py-32 border-t border-zinc-200 dark:border-zinc-900">
             <div className="container mx-auto px-6 lg:px-8">
 
                 <div className="mx-auto max-w-2xl text-center mb-20">
                     <h2 className="text-sm font-bold leading-7 text-primary font-heading uppercase tracking-[0.2em] mb-4">
-                        Player Feedback
+                        {t('title')}
                     </h2>
-                    <p className="mt-2 text-4xl font-black tracking-tighter text-white sm:text-6xl font-heading uppercase">
-                        Built for the game.
+                    <p className="mt-2 text-4xl font-black tracking-tighter text-zinc-900 dark:text-white sm:text-6xl font-heading uppercase">
+                        {t('heading')}
                     </p>
                 </div>
 
@@ -51,17 +55,17 @@ export function TestimonialsSection() {
                             whileInView={{ opacity: 1, y: 0, scale: 1 }}
                             viewport={{ once: true, margin: "-50px" }}
                             transition={{ duration: 0.6, type: "spring", bounce: 0.4, delay: i * 0.15 }}
-                            className="flex flex-col justify-between bg-zinc-900 rounded-none p-10 border border-zinc-800 shadow-xl hover:border-primary/30 transition-colors duration-300"
+                            className="flex flex-col justify-between bg-white dark:bg-zinc-900 rounded-none p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl hover:border-primary/30 dark:hover:border-primary/30 transition-colors duration-300"
                         >
-                            <p className="text-lg leading-relaxed text-zinc-300 font-sans italic mb-10">
+                            <p className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 font-sans italic mb-10">
                                 "{testimonial.body}"
                             </p>
-                            <div className="flex items-center gap-x-5 mt-auto pt-6 border-t border-zinc-800/50">
-                                <div className="h-14 w-14 rounded-none bg-zinc-950 flex items-center justify-center text-primary font-black font-heading border border-zinc-800">
+                            <div className="flex items-center gap-x-5 mt-auto pt-6 border-t border-zinc-200 dark:border-zinc-800/50">
+                                <div className="h-14 w-14 rounded-none bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center text-primary font-black font-heading border border-zinc-200 dark:border-zinc-800">
                                     {testimonial.author.initials}
                                 </div>
                                 <div>
-                                    <div className="font-bold text-white tracking-wide font-heading uppercase">{testimonial.author.name}</div>
+                                    <div className="font-bold text-zinc-900 dark:text-white tracking-wide font-heading uppercase">{testimonial.author.name}</div>
                                     <div className="text-sm text-zinc-500 font-sans tracking-wider uppercase mt-1">{testimonial.author.role}</div>
                                 </div>
                             </div>

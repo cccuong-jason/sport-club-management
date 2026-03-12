@@ -4,29 +4,12 @@ import { motion, useMotionValue, useSpring, useTransform, Variants } from 'frame
 import Image from 'next/image'
 import { useRef } from 'react'
 
-const showcases = [
-    {
-        title: "ATTENDANCE VISIBILITY",
-        metric: "100%",
-        description: "Clubs report perfect visibility into who is showing up to match days.",
-        color: "from-emerald-500/20 to-zinc-950",
-    },
-    {
-        title: "TIME SAVED",
-        metric: "4Hrs",
-        description: "Average time saved per week by managers cutting out WhatsApp chasing.",
-        color: "from-blue-500/20 to-zinc-950",
-    },
-    {
-        title: "FEE RECOVERY",
-        metric: "30%",
-        description: "Increase in recovered match fees through transparent digital ledgers.",
-        color: "from-purple-500/20 to-zinc-950",
-    }
-]
+// Removed static showcases array
+
+import { useTranslations } from 'next-intl'
 
 // 3D Tilt Card Component
-function TiltCard({ showcase, index }: { showcase: typeof showcases[0], index: number }) {
+function TiltCard({ showcase, index }: { showcase: { title: string, metric: string, description: string, color: string }, index: number }) {
     const ref = useRef<HTMLDivElement>(null)
 
     // Mouse tracking values
@@ -98,40 +81,63 @@ function TiltCard({ showcase, index }: { showcase: typeof showcases[0], index: n
                     rotateY,
                     transformStyle: "preserve-3d"
                 }}
-                className={`relative w-full h-[400px] border border-zinc-800 bg-zinc-900 overflow-hidden cursor-crosshair group`}
+                className={`relative w-full h-[400px] border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 overflow-hidden cursor-crosshair group shadow-xl`}
             >
                 {/* Background Gradient responding to card type */}
-                <div className={`absolute inset-0 bg-gradient-to-br ${showcase.color} opacity-40 transition-opacity duration-500 group-hover:opacity-80`} />
+                <div className={`absolute inset-0 bg-gradient-to-br ${showcase.color} opacity-20 dark:opacity-40 transition-opacity duration-500 group-hover:opacity-60 dark:group-hover:opacity-80`} />
 
                 {/* Internal Card Content that POPS further out in 3D space */}
                 <div
                     style={{ transform: "translateZ(50px)" }} // Pushes content out towards user
                     className="absolute inset-0 p-8 flex flex-col justify-between z-10"
                 >
-                    <h3 className="text-zinc-400 font-bold uppercase tracking-widest text-xs font-mono">
+                    <h3 className="text-zinc-500 dark:text-zinc-400 font-bold uppercase tracking-widest text-xs font-mono">
                         {showcase.title}
                     </h3>
 
                     <div>
-                        <div className="text-7xl font-black text-white font-heading tracking-tighter mb-4">
+                        <div className="text-7xl font-black text-zinc-900 dark:text-white font-heading tracking-tighter mb-4">
                             {showcase.metric}
                         </div>
-                        <p className="text-zinc-300 font-sans leading-relaxed max-w-xs">
+                        <p className="text-zinc-600 dark:text-zinc-300 font-sans leading-relaxed max-w-xs">
                             {showcase.description}
                         </p>
                     </div>
                 </div>
 
                 {/* Optional grid overlay for texture */}
-                <div className="absolute inset-0 z-0 bg-[url('/grid.svg')] opacity-10" style={{ transform: "translateZ(10px)" }} />
+                <div className="absolute inset-0 z-0 bg-[url('/grid.svg')] opacity-5 dark:opacity-10" style={{ transform: "translateZ(10px)" }} />
             </motion.div>
         </motion.div>
     )
 }
 
 export function ShowcasesSection() {
+    const t = useTranslations('Landing.Showcases')
+
+    const showcases = [
+        {
+            title: t('items.attendance.title'),
+            metric: "100%",
+            description: t('items.attendance.description'),
+            color: "from-emerald-500/20 to-zinc-50 dark:to-zinc-950",
+        },
+        {
+            title: t('items.time.title'),
+            metric: "4Hrs",
+            description: t('items.time.description'),
+            color: "from-blue-500/20 to-zinc-50 dark:to-zinc-950",
+        },
+        {
+            title: t('items.finance.title'),
+            metric: "30%",
+            description: t('items.finance.description'),
+            color: "from-purple-500/20 to-zinc-50 dark:to-zinc-950",
+        }
+    ]
+
     return (
-        <section id="showcases" className="py-24 sm:py-32 bg-zinc-950 overflow-hidden border-b border-zinc-900 border-t">
+        <section id="showcases" className="py-24 sm:py-32 bg-zinc-50 dark:bg-zinc-950 overflow-hidden border-b border-zinc-200 dark:border-zinc-900 border-t">
             <div className="container mx-auto px-6 lg:px-8">
 
                 <div className="mb-20">
@@ -139,18 +145,18 @@ export function ShowcasesSection() {
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="text-5xl md:text-7xl font-black tracking-tighter uppercase font-heading text-white mb-6"
+                        className="text-5xl md:text-7xl font-black tracking-tighter uppercase font-heading text-zinc-900 dark:text-white mb-6"
                     >
-                        Proven <span className="text-primary">Results.</span>
+                        {t('heading1')} <span className="text-primary">{t('heading2')}</span>
                     </motion.h2>
                     <motion.p
                         initial={{ opacity: 0, y: 30 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         transition={{ delay: 0.1 }}
-                        className="text-zinc-400 max-w-xl text-lg leading-relaxed font-sans"
+                        className="text-zinc-600 dark:text-zinc-400 max-w-xl text-lg leading-relaxed font-sans"
                     >
-                        Management systems that deliver tangible improvements to your club's efficiency, turnout, and financial health.
+                        {t('description')}
                     </motion.p>
                 </div>
 

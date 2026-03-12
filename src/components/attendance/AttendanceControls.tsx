@@ -1,6 +1,6 @@
 'use client'
 
-import { markAll } from '@/app/(main)/attendance/actions'
+import { markAll } from '@/app/[locale]/(main)/attendance/actions'
 import { Button } from '@/components/ui/button'
 
 export function AttendanceControls({ eventId }: { eventId: string }) {
