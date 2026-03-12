@@ -1,5 +1,4 @@
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { connectDB } from '@/lib/db'
 import { User } from '@/models/User'
@@ -10,13 +9,13 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 
 export default async function InvitePage() {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any)?.role)) return <main className="p-6">Admins only</main>
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return <main className="p-6">Admins only</main>
 
   async function invite(formData: FormData) {
     'use server'
-    const session = await getServerSession(authOptions)
-    if (!isAdmin((session as any)?.role)) return
+    const authUser = await getAuthUser()
+    if (!isAdmin(authUser?.role)) return
     await connectDB()
     const email = String(formData.get('email') || '')
     const name = String(formData.get('name') || '')
@@ -25,7 +24,7 @@ export default async function InvitePage() {
     if (!existing) {
       await User.create({ email, name: name || email.split('@')[0], role: 'member' })
     }
-    const link = `${process.env.NEXTAUTH_URL || 'http://localhost:3000'}/signup?email=${encodeURIComponent(email)}`
+    const link = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/sign-up?email_address=${encodeURIComponent(email)}`
     try {
       const { sendEventNotification } = await import('@/lib/mailer')
       await sendEventNotification(email, 'You are invited to Football Club', `Register here: <a href="${link}">${link}</a>`)

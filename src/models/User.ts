@@ -1,10 +1,9 @@
-import { Schema, model, models } from 'mongoose'
+import mongoose, { Schema, model } from 'mongoose'
 
 const UserSchema = new Schema({
+  clerkId: { type: String, unique: true, sparse: true },
   name: { type: String, required: true },
   email: { type: String, required: true, unique: true },
-  role: { type: String, enum: ['admin', 'member'], default: 'member' },
-  status: { type: String, enum: ['active', 'inactive', 'unavailable'], default: 'active' },
   position: String,
   phoneNumber: String,
   dateOfBirth: Date,
@@ -15,18 +14,15 @@ const UserSchema = new Schema({
 
 export type IUser = {
   _id: string
+  clerkId?: string
   name: string
   email: string
-  role: 'admin'|'member'
   position?: string
   phoneNumber?: string
   dateOfBirth?: Date
   citizenId?: string
   photoUrl?: string
-  passwordHash?: string
-  status?: string
 }
 
-// Ensure models is defined before accessing User
-const Model = models?.User || model('User', UserSchema)
+const Model = mongoose.models?.User || model('User', UserSchema)
 export const User = Model

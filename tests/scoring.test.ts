@@ -13,7 +13,7 @@ test('tally and sort', () => {
     { playerId: 'B', placement: 1 },
     { playerId: 'B', placement: 3 },
     { playerId: 'C', placement: 3 },
-  ]
+  ] as Array<{ playerId: string, placement: 1 | 2 | 3 }>
   const tallied = tallyVotes(votes)
   const sorted = sortWithTiebreakers(tallied)
   expect(sorted[0].playerId).toBe('A')

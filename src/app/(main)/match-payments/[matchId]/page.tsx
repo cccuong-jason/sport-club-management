@@ -2,8 +2,7 @@ import { connectDB } from '@/lib/db'
 import { MatchPayment } from '@/models/MatchPayment'
 import { User } from '@/models/User'
 import { Event } from '@/models/Event'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { redirect } from 'next/navigation'
 import { PaymentForm } from '@/components/match-payments/PaymentForm'
@@ -13,14 +12,14 @@ import { Users, CheckCircle, Clock, DollarSign } from 'lucide-react'
 
 export default async function MatchPaymentsPage(props: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await props.params
-  const session = await getServerSession(authOptions)
-  if (!session) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!authUser) redirect('/')
   await connectDB()
-  
+
   // Get match details
   const match = await Event.findById(matchId).lean<any>()
   if (!match || match.type !== 'match') redirect('/events')
-  
+
   const users = await User.find().lean<any>().then(users => users.map((u: any) => ({
     ...u,
     _id: u._id.toString(),
@@ -43,7 +42,7 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
   const pendingPlayers = payments.filter((p: any) => p.status === 'pending').length
   const totalAmount = payments.reduce((sum: number, p: any) => sum + (p.amount || 0), 0)
 
-  const isUserAdmin = isAdmin((session as any).role)
+  const isUserAdmin = isAdmin(authUser?.role)
 
   return (
     <main className="space-y-8">
@@ -70,7 +69,7 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
             <Users className="h-6 w-6 text-blue-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-green-50/50 border-green-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -80,7 +79,7 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
             <CheckCircle className="h-6 w-6 text-green-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-yellow-50/50 border-yellow-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -90,7 +89,7 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
             <Clock className="h-6 w-6 text-yellow-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-purple-50/50 border-purple-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -116,10 +115,10 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
           <div className="divide-y">
             {users.map((u: any) => {
               const p = byUser[String(u._id)]
-              const currentUser = String(u._id) === String((session as any)?.user?.id)
-              
+              const currentUser = String(u._id) === String(authUser?.mongoId)
+
               return (
-                <PaymentRow 
+                <PaymentRow
                   key={u._id}
                   matchId={matchId}
                   user={{ _id: String(u._id), name: u.name }}

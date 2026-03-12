@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const PaymentRequestSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   type: { type: String, enum: ['monthly', 'penalty', 'custom'], required: true },
   title: { type: String, required: true },
   amount: { type: Number, required: true },

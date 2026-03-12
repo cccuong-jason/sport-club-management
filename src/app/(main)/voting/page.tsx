@@ -1,8 +1,7 @@
 import { connectDB } from '@/lib/db'
 import { Event } from '@/models/Event'
 import { Vote } from '@/models/Vote'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -13,8 +12,8 @@ import Link from 'next/link'
 async function listMatchEvents() {
   await connectDB()
   // Find events of type 'match' or 'training'
-  const events = await Event.find({ 
-    type: { $in: ['match', 'training'] } 
+  const events = await Event.find({
+    type: { $in: ['match', 'training'] }
   }).sort({ date: -1 }).lean<any>()
   return events.map((m: any) => ({
     ...m,
@@ -36,10 +35,10 @@ async function getVoteCounts() {
 }
 
 export default async function VotingDashboardPage() {
-  const session = await getServerSession(authOptions)
+  const authUser = await getAuthUser()
   const matches = await listMatchEvents()
   const voteCounts = await getVoteCounts()
-  const isUserAdmin = isAdmin((session as any)?.role)
+  const isUserAdmin = isAdmin(authUser?.role)
 
   return (
     <main className="space-y-8">
@@ -52,7 +51,7 @@ export default async function VotingDashboardPage() {
         {matches.map((match: any) => {
           const voteCount = voteCounts[match._id] || 0
           const isPast = new Date(match.date) < new Date()
-          
+
           return (
             <Card key={match._id} className="flex flex-col">
               <CardHeader>
@@ -62,9 +61,9 @@ export default async function VotingDashboardPage() {
                     {match.title}
                   </CardTitle>
                   {isPast ? (
-                     <Badge variant="secondary">Ended</Badge>
+                    <Badge variant="secondary">Ended</Badge>
                   ) : (
-                     <Badge variant="default" className="bg-green-600">Active</Badge>
+                    <Badge variant="default" className="bg-green-600">Active</Badge>
                   )}
                 </div>
                 <CardDescription className="flex items-center gap-2 mt-1">
@@ -77,10 +76,10 @@ export default async function VotingDashboardPage() {
                   <MapPin className="h-3 w-3" />
                   {match.location || 'No location'}
                 </div>
-                
+
                 <div className="bg-muted/50 p-3 rounded-md">
-                   <div className="text-sm font-medium text-muted-foreground">Votes Cast</div>
-                   <div className="text-2xl font-bold">{voteCount}</div>
+                  <div className="text-sm font-medium text-muted-foreground">Votes Cast</div>
+                  <div className="text-2xl font-bold">{voteCount}</div>
                 </div>
               </CardContent>
               <CardFooter className="pt-4 border-t flex gap-2">
@@ -91,17 +90,17 @@ export default async function VotingDashboardPage() {
                   </Link>
                 </Button>
                 {isUserAdmin && (
-                   <Button variant="outline" size="icon" asChild>
-                     <Link href={`/voting/${match._id}`} target="_blank">
-                       <ExternalLink className="h-4 w-4" />
-                     </Link>
-                   </Button>
+                  <Button variant="outline" size="icon" asChild>
+                    <Link href={`/voting/${match._id}`} target="_blank">
+                      <ExternalLink className="h-4 w-4" />
+                    </Link>
+                  </Button>
                 )}
               </CardFooter>
             </Card>
           )
         })}
-        
+
         {matches.length === 0 && (
           <div className="col-span-full text-center py-10 text-muted-foreground">
             No match events found. Create a match event to enable voting.

@@ -1,8 +1,7 @@
 import { connectDB } from '@/lib/db'
 import { Event } from '@/models/Event'
 import { Season } from '@/models/Season'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { CreateEventForm } from '@/components/events/CreateEventForm'
 import { EventsList } from '@/components/events/EventsList'
@@ -29,10 +28,10 @@ async function getSeasons() {
 }
 
 export default async function EventsPage() {
-  const session = await getServerSession(authOptions)
+  const authUser = await getAuthUser()
   const events = await listEvents()
   const seasons = await getSeasons()
-  
+
   return (
     <main className="space-y-8">
       <div className="flex items-center justify-between">
@@ -42,7 +41,7 @@ export default async function EventsPage() {
         </div>
       </div>
 
-      {isAdmin((session as any)?.role) && <CreateEventForm seasons={seasons} />}
+      {isAdmin(authUser?.role) && <CreateEventForm seasons={seasons} />}
 
       <EventsList events={events} />
     </main>

@@ -3,14 +3,13 @@
 import { connectDB } from '@/lib/db'
 import { Attendance } from '@/models/Attendance'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 
-export async function markAll(eventId: string, status: 'present'|'absent'|'unexpected') {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return
+export async function markAll(eventId: string, status: 'present' | 'absent' | 'unexpected') {
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return
   await connectDB()
   const all = await User.find().lean<any>()
   for (const u of all) {
@@ -20,12 +19,12 @@ export async function markAll(eventId: string, status: 'present'|'absent'|'unexp
 }
 
 export async function setOne(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return
   await connectDB()
   const eventId = String(formData.get('eventId'))
   const userId = String(formData.get('userId'))
-  const status = String(formData.get('status')) as 'present'|'absent'|'unexpected'
+  const status = String(formData.get('status')) as 'present' | 'absent' | 'unexpected'
   await Attendance.updateOne({ eventId, userId }, { status, markedBy: null }, { upsert: true })
   revalidatePath(`/attendance/${eventId}`)
 }

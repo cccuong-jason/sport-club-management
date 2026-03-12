@@ -6,7 +6,6 @@ import { Input } from '@/components/ui/input'
 import { Shield, Users, Search } from 'lucide-react'
 import { MemberCard } from '@/components/team/MemberCard'
 import { AddMemberForm } from '@/components/team/AddMemberForm'
-import { ClaimAdminButton } from '@/components/team/ClaimAdminButton'
 
 interface TeamListProps {
   members: any[]
@@ -17,7 +16,7 @@ interface TeamListProps {
 export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredMembers = members.filter(m => 
+  const filteredMembers = members.filter(m =>
     m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     m.email.toLowerCase().includes(searchTerm.toLowerCase())
   )
@@ -44,7 +43,6 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          {!isAdmin && adminCount === 0 && <ClaimAdminButton />}
         </div>
       </div>
 
@@ -62,7 +60,7 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
             {adminMembers.length > 0 ? (
               <div className="divide-y">
                 {adminMembers.map((m) => (
-                  <MemberCard key={m._id} member={m} isAdmin={isAdmin} />
+                  <MemberCard key={m._id} member={m} isAdmin={isAdmin} currentUserId={currentUserId} />
                 ))}
               </div>
             ) : (
@@ -84,7 +82,7 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
             {regularMembers.length > 0 ? (
               <div className="divide-y">
                 {regularMembers.map((m) => (
-                  <MemberCard key={m._id} member={m} isAdmin={isAdmin} />
+                  <MemberCard key={m._id} member={m} isAdmin={isAdmin} currentUserId={currentUserId} />
                 ))}
               </div>
             ) : (

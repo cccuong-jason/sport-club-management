@@ -2,39 +2,45 @@
 
 import { connectDB } from '@/lib/db'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { ClubMember } from '@/models/ClubMember'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import bcrypt from 'bcryptjs'
 
 export async function addMember(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role) || !authUser?.activeClubId) return { success: false, message: 'Unauthorized' }
   await connectDB()
   const name = String(formData.get('name') || '')
   const email = String(formData.get('email') || '')
   const position = String(formData.get('position') || '')
   if (!email || !name) return { success: false, message: 'Missing name or email' }
-  
+
   try {
-    // Check if user already exists
-    const existing = await User.findOne({ email })
-    if (existing) return { success: false, message: 'User with this email already exists' }
+    let user = await User.findOne({ email })
+    if (!user) {
+      const hashedPassword = await bcrypt.hash('123456', 10)
+      user = await User.create({
+        name,
+        email,
+        position,
+        passwordHash: hashedPassword
+      })
+    }
 
-    // Hash default password '123456'
-    const hashedPassword = await bcrypt.hash('123456', 10)
+    const existingMember = await ClubMember.findOne({ userId: user._id, clubId: authUser.activeClubId })
+    if (existingMember) return { success: false, message: 'User is already in this club' }
 
-    await User.create({ 
-      name, 
-      email, 
-      role: 'member', 
-      position, 
-      status: 'active',
-      passwordHash: hashedPassword
+    await ClubMember.create({
+      userId: user._id,
+      clubId: authUser.activeClubId,
+      role: 'member',
+      status: 'active'
     })
+
     revalidatePath('/team')
-    return { success: true, message: 'Member account created with default password (123456)' }
+    return { success: true, message: 'Member added to club' }
   } catch (error) {
     console.error(error)
     return { success: false, message: 'Failed to add member' }
@@ -42,14 +48,14 @@ export async function addMember(formData: FormData) {
 }
 
 export async function setRole(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role) || !authUser?.activeClubId) return { success: false, message: 'Unauthorized' }
   await connectDB()
-  const userId = String(formData.get('userId'))
-  const role = String(formData.get('role')) as 'admin'|'member'
-  
+  const memberId = String(formData.get('userId')) // refers to User._id
+  const role = String(formData.get('role')) as 'admin' | 'member'
+
   try {
-    await User.updateOne({ _id: userId }, { role })
+    await ClubMember.updateOne({ userId: memberId, clubId: authUser.activeClubId }, { role })
     revalidatePath('/team')
     return { success: true, message: 'Role updated successfully' }
   } catch (error) {
@@ -58,14 +64,14 @@ export async function setRole(formData: FormData) {
 }
 
 export async function setStatus(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role) || !authUser?.activeClubId) return { success: false, message: 'Unauthorized' }
   await connectDB()
-  const userId = String(formData.get('userId'))
-  const status = String(formData.get('status')) as 'active'|'inactive'|'unavailable'
-  
+  const memberId = String(formData.get('userId'))
+  const status = String(formData.get('status')) as 'active' | 'inactive' | 'pending_approval' | 'leaving'
+
   try {
-    await User.updateOne({ _id: userId }, { status })
+    await ClubMember.updateOne({ userId: memberId, clubId: authUser.activeClubId }, { status })
     revalidatePath('/team')
     return { success: true, message: 'Status updated successfully' }
   } catch (error) {
@@ -74,18 +80,18 @@ export async function setStatus(formData: FormData) {
 }
 
 export async function updateMemberDetails(formData: FormData) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
   await connectDB()
-  
+
   const userId = String(formData.get('userId'))
   const name = String(formData.get('name') || '')
   const email = String(formData.get('email') || '')
   const position = String(formData.get('position') || '')
-  
+
   try {
     await User.updateOne(
-      { _id: userId }, 
+      { _id: userId },
       { name, email, position }
     )
     revalidatePath('/team')
@@ -96,31 +102,49 @@ export async function updateMemberDetails(formData: FormData) {
 }
 
 export async function removeMember(userId: string) {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any).role)) return { success: false, message: 'Unauthorized' }
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role) || !authUser?.activeClubId) return { success: false, message: 'Unauthorized' }
   await connectDB()
-  
+
   try {
-    await User.findByIdAndDelete(userId)
+    await ClubMember.findOneAndDelete({ userId, clubId: authUser.activeClubId })
     revalidatePath('/team')
-    return { success: true, message: 'Member removed successfully' }
+    return { success: true, message: 'Member removed from club successfully' }
   } catch (error) {
     return { success: false, message: 'Failed to remove member' }
   }
 }
 
-export async function claimAdmin() {
-  const session = await getServerSession(authOptions)
-  if (!session?.user?.email) return { success: false, message: 'Not authenticated' }
+export async function requestLeaveClub() {
+  const authUser = await getAuthUser()
+  if (!authUser || !authUser.activeClubId) return { success: false, message: 'Not authenticated' }
   await connectDB()
-  const adminExists = await User.countDocuments({ role: 'admin' })
-  if (adminExists > 0) return { success: false, message: 'Admin already exists' }
-  
+
   try {
-    await User.updateOne({ email: session.user.email }, { role: 'admin' })
+    await ClubMember.updateOne(
+      { userId: authUser.mongoId, clubId: authUser.activeClubId },
+      { status: 'leaving', leaveRequestedAt: new Date() }
+    )
     revalidatePath('/team')
-    return { success: true, message: 'You are now an admin' }
+    revalidatePath('/dashboard')
+    return { success: true, message: 'Leave request submitted successfully. Waiting for admin approval or 7-day auto-release.' }
   } catch (error) {
-    return { success: false, message: 'Failed to claim admin' }
+    return { success: false, message: 'Failed to request leave' }
   }
 }
+
+export async function approveTransfer(userId: string) {
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role) || !authUser?.activeClubId) return { success: false, message: 'Unauthorized' }
+  await connectDB()
+
+  try {
+    await ClubMember.findOneAndDelete({ userId, clubId: authUser.activeClubId })
+    revalidatePath('/team')
+    return { success: true, message: 'Transfer approved and member removed from club.' }
+  } catch (error) {
+    return { success: false, message: 'Failed to approve transfer' }
+  }
+}
+
+

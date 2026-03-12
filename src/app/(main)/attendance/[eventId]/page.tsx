@@ -1,8 +1,7 @@
 import { connectDB } from '@/lib/db'
 import { Attendance } from '@/models/Attendance'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { redirect } from 'next/navigation'
 import { AttendanceControls } from '@/components/attendance/AttendanceControls'
@@ -13,10 +12,10 @@ import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components
 
 export default async function AttendancePage(props: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await props.params
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any)?.role)) redirect('/signin')
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) redirect('/')
   await connectDB()
-  
+
   const event = await (await import('@/models/Event')).Event.findById(eventId).lean<any>()
   const users = await User.find().lean<any>().then(users => users.map((u: any) => ({
     ...u,
@@ -60,7 +59,7 @@ export default async function AttendancePage(props: { params: Promise<{ eventId:
             <CheckCircle className="h-6 w-6 text-green-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-red-50/50 border-red-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -70,7 +69,7 @@ export default async function AttendancePage(props: { params: Promise<{ eventId:
             <XCircle className="h-6 w-6 text-red-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-yellow-50/50 border-yellow-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -80,7 +79,7 @@ export default async function AttendancePage(props: { params: Promise<{ eventId:
             <AlertTriangle className="h-6 w-6 text-yellow-600" />
           </CardContent>
         </Card>
-        
+
         <Card className="bg-blue-50/50 border-blue-200">
           <CardContent className="p-6 flex items-center justify-between">
             <div>
@@ -113,11 +112,11 @@ export default async function AttendancePage(props: { params: Promise<{ eventId:
                 const rec = byUser[String(u._id)]
                 const status = rec?.status || 'not-marked'
                 return (
-                  <AttendanceRow 
-                    key={u._id} 
-                    eventId={eventId} 
-                    user={{ _id: String(u._id), name: u.name, email: u.email }} 
-                    status={status} 
+                  <AttendanceRow
+                    key={u._id}
+                    eventId={eventId}
+                    user={{ _id: String(u._id), name: u.name, email: u.email }}
+                    status={status}
                   />
                 )
               })}

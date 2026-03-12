@@ -1,30 +1,36 @@
-import Link from 'next/link'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
-import { Button } from '@/components/ui/button'
+import { auth } from '@clerk/nextjs/server'
+import { LandingHeader } from '@/components/landing/LandingHeader'
+import { HeroSection } from '@/components/landing/HeroSection'
+import { SocialProofBar } from '@/components/landing/SocialProofBar'
+import { HowItWorksSection } from '@/components/landing/HowItWorksSection'
+import { CapabilitiesSection } from '@/components/landing/CapabilitiesSection'
+import { FeaturesDeepDive } from '@/components/landing/FeaturesDeepDive'
+import { ShowcasesSection } from '@/components/landing/ShowcasesSection'
+import { TestimonialsSection } from '@/components/landing/TestimonialsSection'
+import { FinalCta } from '@/components/landing/FinalCta'
+import { Footer } from '@/components/landing/Footer'
+
+import { redirect } from 'next/navigation'
 
 export default async function Home() {
-  const session = await getServerSession(authOptions)
-  
+  const { userId } = await auth()
+
+  if (userId) {
+    redirect('/dashboard')
+  }
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-6 bg-slate-50 text-center">
-      <h1 className="text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">
-        Football Club Management
-      </h1>
-      <p className="mt-6 text-lg leading-8 text-gray-600">
-        Manage your team, events, attendance, and funds in one place.
-      </p>
-      <div className="mt-10 flex items-center justify-center gap-x-6">
-        {session ? (
-          <Button asChild size="lg">
-            <Link href="/dashboard">Go to Dashboard</Link>
-          </Button>
-        ) : (
-          <Button asChild size="lg">
-            <Link href="/signin">Sign In</Link>
-          </Button>
-        )}
-      </div>
+    <main className="bg-zinc-950 text-white flex flex-col min-h-screen">
+      <LandingHeader userId={userId} />
+      <HeroSection userId={userId} />
+      <SocialProofBar />
+      <HowItWorksSection />
+      <CapabilitiesSection />
+      <FeaturesDeepDive />
+      <ShowcasesSection />
+      <TestimonialsSection />
+      <FinalCta userId={userId} />
+      <Footer />
     </main>
   )
 }

@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const FundTransactionSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   teamId: { type: Schema.Types.ObjectId, ref: 'Team' },
   type: { type: String, enum: ['contribution', 'expense'], required: true },
   amount: { type: Number, required: true },

@@ -1,8 +1,7 @@
 import { connectDB } from '@/lib/db'
 import { Attendance } from '@/models/Attendance'
 import { User } from '@/models/User'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 
@@ -30,8 +29,8 @@ async function computeAttendance() {
 }
 
 export default async function AttendanceReportPage() {
-  const session = await getServerSession(authOptions)
-  if (!isAdmin((session as any)?.role)) return <main className="p-6">Admins only</main>
+  const authUser = await getAuthUser()
+  if (!isAdmin(authUser?.role)) return <main className="p-6">Admins only</main>
   const entries = await computeAttendance()
   return (
     <main className="space-y-8">
@@ -55,7 +54,7 @@ export default async function AttendanceReportPage() {
               {entries.map((e: any, idx: number) => (
                 <div key={e.userId} className="flex items-center justify-between p-3 text-sm hover:bg-muted/50 transition-colors">
                   <div className="flex flex-col">
-                    <span className="font-medium">#{idx+1} {e.name}</span>
+                    <span className="font-medium">#{idx + 1} {e.name}</span>
                     <span className="text-xs text-muted-foreground">{e.email}</span>
                   </div>
                   <div className="flex items-center gap-4">
@@ -64,8 +63,8 @@ export default async function AttendanceReportPage() {
                       <div className="text-xs text-muted-foreground">{e.present}/{e.total} sessions</div>
                     </div>
                     <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
-                      <div 
-                        className="h-full bg-primary transition-all" 
+                      <div
+                        className="h-full bg-primary transition-all"
                         style={{ width: `${e.percent}%` }}
                       />
                     </div>

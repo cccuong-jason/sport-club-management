@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const AttendanceSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club', required: true },
   eventId: { type: Schema.Types.ObjectId, ref: 'Event', required: true },
   userId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   status: { type: String, enum: ['present', 'absent', 'unexpected'], required: true },

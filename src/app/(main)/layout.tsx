@@ -1,4 +1,6 @@
 import { AppSidebar } from "@/components/app-sidebar"
+import { getAuthUser } from "@/lib/auth-user"
+import { redirect } from "next/navigation"
 import {
   SidebarInset,
   SidebarProvider,
@@ -16,10 +18,18 @@ import {
 
 import { NotificationCenter } from "@/components/notifications/NotificationCenter"
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default async function MainLayout({ children }: { children: React.ReactNode }) {
+  const user = await getAuthUser()
+  if (user?.status === 'onboarding') {
+    redirect('/onboarding')
+  }
+  if (user?.status === 'pending_approval') {
+    redirect('/onboarding/pending')
+  }
+
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <AppSidebar authUser={user!} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between border-b px-4 bg-background sticky top-0 z-10">
           <div className="flex items-center gap-2">

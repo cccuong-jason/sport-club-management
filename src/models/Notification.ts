@@ -1,6 +1,7 @@
 import { Schema, model, models } from 'mongoose'
 
 const NotificationSchema = new Schema({
+  clubId: { type: Schema.Types.ObjectId, ref: 'Club' }, // Optional because some notifications might be system-wide
   recipientId: { type: Schema.Types.ObjectId, ref: 'User', required: true },
   type: { type: String, required: true }, // e.g., 'info', 'success', 'warning'
   message: { type: String, required: true },

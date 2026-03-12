@@ -6,14 +6,13 @@ import { Season } from '@/models/Season'
 import { decryptSelections } from '@/lib/crypto'
 import { tallyVotes, sortWithTiebreakers, attendancePoint } from '@/lib/scoring'
 import { isAdmin } from '@/lib/rbac'
-import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth-options'
+import { getAuthUser } from '@/lib/auth-user'
 
 async function compute(from?: Date, to?: Date) {
   await connectDB()
   const users = await User.find().lean<any>()
   const votes = await Vote.find().lean<any>()
-  const decoded: Array<{ playerId: string, placement: 1|2|3 }> = []
+  const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
   for (const v of votes) {
     const d = JSON.parse(decryptSelections(v.selectionsEnc))
     decoded.push({ playerId: d.first, placement: 1 })
@@ -49,11 +48,11 @@ async function compute(from?: Date, to?: Date) {
 }
 
 export default async function LeaderboardPage() {
-  const session = await getServerSession(authOptions)
-  const isUserAdmin = isAdmin((session as any)?.role)
+  const authUser = await getAuthUser()
+  const isUserAdmin = isAdmin(authUser?.role)
   const seasons = isUserAdmin ? await Season.find().sort({ startDate: -1 }).lean<any>() : []
   const { users, entries } = await compute()
-  
+
   return (
     <main className="max-w-6xl mx-auto p-6 space-y-6">
       <div className="flex items-center justify-between">
@@ -89,12 +88,11 @@ export default async function LeaderboardPage() {
                 <div key={e.playerId} className="p-6 hover:bg-gray-50 transition-colors">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-4">
-                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${
-                        idx === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
-                        idx === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-500' :
-                        idx === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-600' :
-                        'bg-gradient-to-r from-blue-400 to-blue-600'
-                      }`}>
+                      <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold ${idx === 0 ? 'bg-gradient-to-r from-yellow-400 to-yellow-600' :
+                          idx === 1 ? 'bg-gradient-to-r from-gray-300 to-gray-500' :
+                            idx === 2 ? 'bg-gradient-to-r from-orange-400 to-orange-600' :
+                              'bg-gradient-to-r from-blue-400 to-blue-600'
+                        }`}>
                         {idx + 1}
                       </div>
                       <div>
@@ -111,7 +109,7 @@ export default async function LeaderboardPage() {
                       <div className="text-sm text-gray-500">Total Score</div>
                     </div>
                   </div>
-                  
+
                   {isUserAdmin && (
                     <div className="mt-4 pt-4 border-t border-gray-100">
                       <div className="grid grid-cols-3 gap-4 text-sm">
