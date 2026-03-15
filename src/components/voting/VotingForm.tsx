@@ -1,6 +1,6 @@
 'use client'
 
-import { submitVote } from '@/app/(main)/voting/actions'
+import { submitVote } from '@/app/[locale]/(main)/voting/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'

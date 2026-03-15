@@ -1,0 +1,170 @@
+{
+    "Landing": {
+        "Header": {
+            "howItWorks": "How It Works",
+            "features": "Features",
+            "testimonials": "Testimonials",
+            "dashboard": "Dashboard →",
+            "getStarted": "Get Started →"
+        },
+        "Hero": {
+            "training": "TRAINING",
+            "develop": "DEVELOP",
+            "manageYour": "Manage Your",
+            "squad": "Squad.",
+            "description": "The modern, high-energy hub built for teams that demand excellence. Track attendance, unleash performance, and enforce accountability continuously.",
+            "returnToDashboard": "RETURN TO DASHBOARD",
+            "getStartedFree": "GET STARTED FREE",
+            "explore": "Explore",
+            "ticker": {
+                "alex": "ALEX JOINED THE CLUB",
+                "match": "MATCH TONIGHT 8:00PM",
+                "players": "12 PLAYERS CONFIRMED",
+                "dues": "MONTHLY DUES: 85%",
+                "sarah": "SARAH VOTED MVP",
+                "payment": "Payment Received",
+                "updated": "Match fees updated",
+                "next": "Next Match"
+            }
+        },
+        "SocialProof": {
+            "matches": "Matches Played",
+            "players": "Active Players",
+            "funds": "Funds Managed"
+        },
+        "HowItWorks": {
+            "title": "Clear Path to the Pitch",
+            "heading": "How It Works",
+            "description": "We built our onboarding to be entirely frictionless. Get your whole team connected and organized before your next training session.",
+            "steps": {
+                "step1": {
+                    "name": "Sign Up Free",
+                    "description": "Create your account in seconds using your email or Google account."
+                },
+                "step2": {
+                    "name": "Join Your Club",
+                    "description": "Find your existing team or create a brand new club space for your squad."
+                },
+                "step3": {
+                    "name": "Manage Together",
+                    "description": "Track attendance, collect funds, and organize events in one central hub."
+                }
+            }
+        },
+        "Capabilities": {
+            "description1": "Our management infrastructure automates the admin work,",
+            "description2": "so you can focus entirely on the match.",
+            "viewMore": "View More",
+            "items": {
+                "attendance": {
+                    "title": "ATTENDANCE",
+                    "description": "Never chase players on WhatsApp again. Automated RSVPs, instant squad views, and strict cutoffs to ensure you always have numbers."
+                },
+                "finances": {
+                    "title": "FINANCES",
+                    "description": "Total transparency on match fees and club dues. Track who paid, who owes, and manage the seasonal budget without the headache."
+                },
+                "statistics": {
+                    "title": "STATISTICS",
+                    "description": "Vote for MVP, track goalscorers, and analyze attendance reliability. Build a culture of performance and accountability."
+                }
+            }
+        },
+        "FeaturesDeepDive": {
+            "title": "Core Capabilities",
+            "heading": "Everything Required.",
+            "tabs": {
+                "events": {
+                    "title": "Events & RSVPs",
+                    "heading": "NEVER PLAY SHORT-HANDED.",
+                    "content": "Schedule matches and training sessions instantly. Players RSVP with one tap, and you always know exactly who is showing up. Send automated reminders to those who forget."
+                },
+                "finance": {
+                    "title": "Club Finances",
+                    "heading": "TRANSPARENT LEDGER.",
+                    "content": "Ditch the chaotic spreadsheets. Track member dues, match-day subs, and log equipment purchases directly against player accounts. Complete visibility for the whole team."
+                },
+                "team": {
+                    "title": "Roster Management",
+                    "heading": "SQUAD IN YOUR POCKET.",
+                    "content": "Keep all player contact info, preferred positions, and emergency details secure in one place. Easily assign Admin capabilities to your coaching staff."
+                },
+                "performance": {
+                    "title": "Performance",
+                    "heading": "GAMIFY YOUR CULTURE.",
+                    "content": "Automatically track attendance rates across the season. Vote for Man of the Match and keep historical data to reward your most dedicated players at the end of the year."
+                }
+            },
+            "mockups": {
+                "inOut": "12 IN / 2 OUT",
+                "pending": "PENDING",
+                "out": "OUT",
+                "clubBalance": "Club Balance"
+            }
+        },
+        "Showcases": {
+            "heading1": "Proven",
+            "heading2": "Results.",
+            "description": "Management systems that deliver tangible improvements to your club's efficiency, turnout, and financial health.",
+            "items": {
+                "attendance": {
+                    "title": "ATTENDANCE VISIBILITY",
+                    "description": "Clubs report perfect visibility into who is showing up to match days."
+                },
+                "time": {
+                    "title": "TIME SAVED",
+                    "description": "Average time saved per week by managers cutting out WhatsApp chasing."
+                },
+                "finance": {
+                    "title": "FEE RECOVERY",
+                    "description": "Increase in recovered match fees through transparent digital ledgers."
+                }
+            }
+        },
+        "Testimonials": {
+            "title": "Player Feedback",
+            "heading": "Built for the game.",
+            "items": {
+                "1": {
+                    "body": "This app transformed how we run Sunday League. We used to chase people down on WhatsApp for subs and attendance. Now it's completely automated.",
+                    "author": "Marcus T.",
+                    "role": "Club Manager"
+                },
+                "2": {
+                    "body": "Finally, a clean interface for amateur sports. It looks professional, and our players actually enjoy checking the app to see who is coming to training.",
+                    "author": "Sarah Jenkins",
+                    "role": "Team Captain"
+                },
+                "3": {
+                    "body": "The finance tracking alone makes it worth it. Knowing exactly who has paid match fees and what our remaining pitch budget is saves me hours of headache.",
+                    "author": "David Chen",
+                    "role": "Treasurer"
+                }
+            }
+        },
+        "FinalCta": {
+            "title1": "Your squad deserves",
+            "title2": "better tools.",
+            "description": "Stop chasing payments and attendance on WhatsApp. Get your whole squad aligned and ready to play today.",
+            "button": "GET STARTED FREE",
+            "dashboard": "RETURN TO DASHBOARD"
+        },
+        "Footer": {
+            "sloganTop": "CLUB MANAGEMENT",
+            "sloganMain": "MANAGE LESS. <br /> PLAY MORE.",
+            "ctaButton": "CREATE YOUR CLUB",
+            "quotes": {
+                "1": "\"AUTOMATED RSVPS MEAN<br />NO MORE CHASING.\"",
+                "2": "\"COMPLETE TRANSPARENCY<br />ON MATCH FEES.\"",
+                "3": "\"YOUR SQUAD IN YOUR<br />POCKET ALWAYS.\""
+            },
+            "nav": {
+                "features": "FEATURES",
+                "howItWorks": "HOW IT WORKS",
+                "twitter": "TWITTER",
+                "support": "SUPPORT"
+            },
+            "copyright": "©GOALZ. ALL RIGHTS RESERVED."
+        }
+    }
+}

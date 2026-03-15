@@ -3,11 +3,7 @@
 import { motion } from 'framer-motion'
 import { useEffect, useState } from 'react'
 
-const stats = [
-    { label: 'Matches Played', value: 500, suffix: '+' },
-    { label: 'Active Players', value: 2000, suffix: '+' },
-    { label: 'Funds Managed', value: 50, prefix: '$', suffix: 'k+' },
-]
+import { useTranslations } from 'next-intl'
 
 function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number, prefix?: string, suffix?: string }) {
     const [count, setCount] = useState(0)
@@ -33,15 +29,23 @@ function AnimatedCounter({ value, prefix = '', suffix = '' }: { value: number, p
     }, [value])
 
     return (
-        <span className="font-heading text-6xl font-black tracking-tighter text-white">
+        <span className="font-heading text-6xl font-black tracking-tighter text-zinc-900 dark:text-white">
             {prefix}{count}<span className="text-primary">{suffix}</span>
         </span>
     )
 }
 
 export function SocialProofBar() {
+    const t = useTranslations('Landing.SocialProof')
+
+    const stats = [
+        { label: t('matches'), value: 500, suffix: '+' },
+        { label: t('players'), value: 2000, suffix: '+' },
+        { label: t('funds'), value: 50, prefix: '$', suffix: 'k+' },
+    ]
+
     return (
-        <section className="bg-zinc-950 border-b border-zinc-900 py-20 relative z-10">
+        <section className="bg-zinc-50 dark:bg-zinc-950 border-b border-zinc-200 dark:border-zinc-900 py-20 relative z-10">
             <div className="container mx-auto px-6 lg:px-8">
                 <div className="grid grid-cols-1 gap-12 text-center sm:grid-cols-3">
                     {stats.map((stat, index) => (

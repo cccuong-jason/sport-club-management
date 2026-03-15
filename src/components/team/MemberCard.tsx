@@ -1,6 +1,6 @@
 'use client'
 
-import { setRole, removeMember, setStatus, updateMemberDetails, requestLeaveClub, approveTransfer } from '@/app/(main)/team/actions'
+import { setRole, removeMember, setStatus, updateMemberDetails, requestLeaveClub, approveTransfer } from '@/app/[locale]/(main)/team/actions'
 import { Button } from '@/components/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Trash2, Crown, User, Shirt, CheckCircle, XCircle, AlertTriangle, Pencil, Clock, LogOut, CheckSquare } from 'lucide-react'

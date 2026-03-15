@@ -1,6 +1,6 @@
 'use client'
 
-import { setOne } from '@/app/(main)/attendance/actions'
+import { setOne } from '@/app/[locale]/(main)/attendance/actions'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { CheckCircle, XCircle, AlertTriangle, HelpCircle } from 'lucide-react'

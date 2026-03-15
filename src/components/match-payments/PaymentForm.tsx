@@ -1,6 +1,6 @@
 'use client'
 
-import { markPaid } from '@/app/(main)/match-payments/actions'
+import { markPaid } from '@/app/[locale]/(main)/match-payments/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

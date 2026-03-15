@@ -1,6 +1,6 @@
 'use client'
 
-import { addMember } from '@/app/(main)/team/actions'
+import { addMember } from '@/app/[locale]/(main)/team/actions'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'

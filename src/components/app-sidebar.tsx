@@ -17,7 +17,7 @@ import {
 import { useUser, useClerk } from "@clerk/nextjs"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import { setClubContextAction } from "@/app/(main)/settings/actions"
+import { setClubContextAction } from "@/app/[locale]/(main)/settings/actions"
 import { AuthUser, ClubMembership } from "@/lib/auth-user"
 import { ChevronsUpDown, Check } from "lucide-react"
 import {

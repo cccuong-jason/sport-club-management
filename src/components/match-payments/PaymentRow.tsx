@@ -1,6 +1,6 @@
 'use client'
 
-import { confirmPayment, rejectPayment } from '@/app/(main)/match-payments/actions'
+import { confirmPayment, rejectPayment } from '@/app/[locale]/(main)/match-payments/actions'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useState } from 'react'
