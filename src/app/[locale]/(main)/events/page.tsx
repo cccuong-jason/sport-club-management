@@ -6,9 +6,10 @@ import { isAdmin } from '@/lib/rbac'
 import { CreateEventForm } from '@/components/events/CreateEventForm'
 import { EventsList } from '@/components/events/EventsList'
 
-async function listEvents() {
+async function listEvents(clubId?: string) {
   await connectDB()
-  const items = await Event.find().sort({ date: -1 }).lean<any>()
+  if (!clubId) return []
+  const items = await Event.find({ clubId }).sort({ date: -1 }).lean<any>()
   return items.map((item: any) => ({
     ...item,
     _id: item._id.toString(),
@@ -16,9 +17,10 @@ async function listEvents() {
   }))
 }
 
-async function getSeasons() {
+async function getSeasons(clubId?: string) {
   await connectDB()
-  const seasons = await Season.find().sort({ startDate: -1 }).lean<any>()
+  if (!clubId) return []
+  const seasons = await Season.find({ clubId }).sort({ startDate: -1 }).lean<any>()
   return seasons.map((s: any) => ({
     ...s,
     _id: s._id.toString(),
@@ -29,8 +31,8 @@ async function getSeasons() {
 
 export default async function EventsPage() {
   const authUser = await getAuthUser()
-  const events = await listEvents()
-  const seasons = await getSeasons()
+  const events = await listEvents(authUser?.activeClubId)
+  const seasons = await getSeasons(authUser?.activeClubId)
 
   return (
     <main className="space-y-8">

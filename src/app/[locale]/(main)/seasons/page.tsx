@@ -2,25 +2,28 @@ import { connectDB } from '@/lib/db'
 import { Season } from '@/models/Season'
 import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
-import { revalidatePath } from 'next/cache'
 import { User } from '@/models/User'
 import { Vote } from '@/models/Vote'
 import { Attendance } from '@/models/Attendance'
+import { ClubMember } from '@/models/ClubMember'
 import { decryptSelections } from '@/lib/crypto'
 import { tallyVotes, sortWithTiebreakers, attendancePoint } from '@/lib/scoring'
+import { getEligibleClubMemberIds } from '@/lib/leaderboard'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { createSeason } from './actions'
 
-async function listSeasons() {
+async function listSeasons(clubId?: string) {
   await connectDB()
-  return Season.find().sort({ startDate: -1 }).lean<any>()
+  if (!clubId) return []
+  return Season.find({ clubId }).sort({ startDate: -1 }).lean<any>()
 }
 
 export default async function SeasonsPage() {
   const authUser = await getAuthUser()
-  const seasons = await listSeasons()
+  const seasons = await listSeasons(authUser?.activeClubId)
   return (
     <main className="space-y-8">
       <div>
@@ -45,18 +48,6 @@ export default async function SeasonsPage() {
 }
 
 function CreateSeasonForm() {
-  async function create(formData: FormData) {
-    'use server'
-    const authUser = await getAuthUser()
-    if (!isAdmin(authUser?.role)) return
-    await connectDB()
-    const name = String(formData.get('name') || '')
-    const startDate = new Date(String(formData.get('startDate') || ''))
-    const endDate = new Date(String(formData.get('endDate') || ''))
-    if (!name || isNaN(startDate.getTime()) || isNaN(endDate.getTime())) return
-    await Season.create({ name, startDate, endDate, teamId: null, createdBy: null })
-    revalidatePath('/seasons')
-  }
   return (
     <Card>
       <CardHeader>
@@ -64,7 +55,7 @@ function CreateSeasonForm() {
         <CardDescription>Define a new time range for tracking points and MVP stats.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form action={create} className="space-y-4">
+        <form action={createSeason} className="space-y-4">
           <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
             <div className="space-y-2">
               <Label htmlFor="name">Season Name</Label>
@@ -86,27 +77,42 @@ function CreateSeasonForm() {
   )
 }
 
-async function computeLeaderboard(from: Date, to: Date) {
+async function computeLeaderboard(from: Date, to: Date, clubId?: string) {
   await connectDB()
-  const users = await User.find().lean<any>()
-  const votes = await Vote.find().lean<any>()
+  const memberships = await ClubMember.find().lean<any[]>()
+  const eligibleUserIds = getEligibleClubMemberIds(
+    memberships.map((membership) => ({
+      clubId: String(membership.clubId),
+      userId: String(membership.userId),
+      status: membership.status,
+    })),
+    clubId
+  )
+
+  if (eligibleUserIds.length === 0) {
+    return { users: [], entries: [] }
+  }
+
+  const users = await User.find({ _id: { $in: eligibleUserIds } }).lean<any>()
+  const votes = await Vote.find(clubId ? { clubId } : {}).lean<any>()
   const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
   for (const v of votes) {
     try {
       const d = JSON.parse(decryptSelections(v.selectionsEnc))
-      decoded.push({ playerId: d.first, placement: 1 })
-      decoded.push({ playerId: d.second, placement: 2 })
-      decoded.push({ playerId: d.third, placement: 3 })
+      if (eligibleUserIds.includes(d.first)) decoded.push({ playerId: d.first, placement: 1 })
+      if (eligibleUserIds.includes(d.second)) decoded.push({ playerId: d.second, placement: 2 })
+      if (eligibleUserIds.includes(d.third)) decoded.push({ playerId: d.third, placement: 3 })
     } catch { }
   }
   const voteTallies = tallyVotes(decoded)
-  const attendance = await Attendance.find().lean<any>()
+  const attendance = await Attendance.find(clubId ? { clubId } : {}).lean<any>()
   const attendanceTallies: Record<string, number> = {}
   for (const a of attendance) {
     const created = new Date(a.createdAt)
     if (from && created < from) continue
     if (to && created > to) continue
     const id = String(a.userId)
+    if (!eligibleUserIds.includes(id)) continue
     attendanceTallies[id] = (attendanceTallies[id] || 0) + attendancePoint(a.status)
   }
 
@@ -136,7 +142,11 @@ async function computeLeaderboard(from: Date, to: Date) {
 }
 
 async function Leaderboard({ season }: { season: any }) {
-  const { users, entries } = await computeLeaderboard(new Date(season.startDate), new Date(season.endDate))
+  const { users, entries } = await computeLeaderboard(
+    new Date(season.startDate),
+    new Date(season.endDate),
+    String(season.clubId)
+  )
   return (
     <div className="mt-4 rounded-md border bg-white overflow-hidden">
       <div className="overflow-x-auto">
