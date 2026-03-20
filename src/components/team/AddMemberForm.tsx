@@ -22,9 +22,9 @@ export function AddMemberForm() {
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Thêm thành viên mới</CardTitle>
+    <Card className="overflow-hidden rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
+      <CardHeader className="border-b border-zinc-200/70 bg-gradient-to-r from-primary/12 via-transparent to-transparent dark:border-zinc-800/70 dark:from-primary/15">
+        <CardTitle className="font-heading text-2xl uppercase tracking-[0.08em]">Thêm thành viên mới</CardTitle>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={handleSubmit} className="space-y-4">

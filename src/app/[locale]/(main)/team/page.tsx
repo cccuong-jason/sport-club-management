@@ -4,6 +4,8 @@ import { ClubMember } from '@/models/ClubMember'
 import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { TeamList } from '@/components/team/TeamList'
+import { AttendanceReportPanel } from '@/components/team/AttendanceReportPanel'
+import { computeAttendanceReport } from '@/lib/attendance-report'
 
 async function listMembers(clubId: string) {
   await connectDB()
@@ -30,14 +32,16 @@ export default async function TeamPage() {
   const members = await listMembers(authUser.activeClubId)
   const isUserAdmin = isAdmin(authUser.role)
   const currentUserId = authUser.mongoId
+  const attendanceEntries = isUserAdmin ? await computeAttendanceReport(authUser.activeClubId) : []
 
   return (
-    <main>
+    <main className="space-y-8">
       <TeamList
         members={members}
         isAdmin={isUserAdmin}
         currentUserId={currentUserId}
       />
+      {isUserAdmin && <AttendanceReportPanel entries={attendanceEntries} />}
     </main>
   )
 }

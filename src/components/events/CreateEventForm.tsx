@@ -6,17 +6,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
-import { format } from 'date-fns'
-import { vi } from 'date-fns/locale'
-import { CalendarIcon } from 'lucide-react'
-import { useState, useRef } from 'react'
+import { useRef } from 'react'
 import { toast } from 'sonner'
+import { EventSchedulePicker } from '@/components/events/EventSchedulePicker'
 
 export function CreateEventForm({ seasons = [] }: { seasons?: any[] }) {
-  const [date, setDate] = useState<Date | undefined>(new Date())
   const formRef = useRef<HTMLFormElement>(null)
 
   const handleSubmit = async (formData: FormData) => {
@@ -24,16 +18,15 @@ export function CreateEventForm({ seasons = [] }: { seasons?: any[] }) {
     if (result?.success) {
       toast.success(result.message)
       formRef.current?.reset()
-      setDate(new Date())
     } else {
       toast.error(result?.message || 'Tạo sự kiện thất bại')
     }
   }
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Tạo sự kiện</CardTitle>
+    <Card className="rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] backdrop-blur dark:border-zinc-800 dark:bg-zinc-950/85">
+      <CardHeader className="border-b border-zinc-200/70 bg-gradient-to-r from-primary/12 via-transparent to-transparent dark:border-zinc-800/70 dark:from-primary/15">
+        <CardTitle className="font-heading text-2xl uppercase tracking-[0.08em]">Tạo sự kiện</CardTitle>
       </CardHeader>
       <CardContent>
         <form ref={formRef} action={handleSubmit} className="space-y-4">
@@ -58,58 +51,8 @@ export function CreateEventForm({ seasons = [] }: { seasons?: any[] }) {
           </div>
 
           <div className="space-y-2">
-            <Label>Lịch trình (Ngày & Giờ)</Label>
-            <div className="flex flex-col md:flex-row gap-4">
-              {/* Date Picker */}
-              <div className="flex-1">
-                <Popover>
-                  <PopoverTrigger asChild>
-                    <Button
-                      variant={"outline"}
-                      className={cn(
-                        "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
-                      )}
-                    >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP", { locale: vi }) : <span>Chọn ngày</span>}
-                    </Button>
-                  </PopoverTrigger>
-                  <PopoverContent className="w-auto p-0">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                      locale={vi}
-                    />
-                  </PopoverContent>
-                </Popover>
-                <input type="hidden" name="date" value={date?.toISOString() || ''} />
-              </div>
-
-              {/* Start Time */}
-              <div className="w-full md:w-32">
-                <Input 
-                  name="startTime" 
-                  type="time" 
-                  placeholder="Bắt đầu" 
-                  required 
-                  className="w-full"
-                />
-              </div>
-
-              {/* End Time */}
-              <div className="w-full md:w-32">
-                <Input 
-                  name="endTime" 
-                  type="time" 
-                  placeholder="Kết thúc" 
-                  required 
-                  className="w-full"
-                />
-              </div>
-            </div>
+            <Label>Lịch trình (Khoảng thời gian)</Label>
+            <EventSchedulePicker />
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -136,7 +79,7 @@ export function CreateEventForm({ seasons = [] }: { seasons?: any[] }) {
             </div>
           </div>
 
-          <Button type="submit">Tạo sự kiện</Button>
+          <Button type="submit" className="rounded-none px-6 font-heading uppercase tracking-[0.12em]">Tạo sự kiện</Button>
         </form>
       </CardContent>
     </Card>

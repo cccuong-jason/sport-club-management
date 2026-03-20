@@ -2,8 +2,8 @@ export type Placement = 1 | 2 | 3
 
 export function placementPoints(p: Placement) {
   switch (p) {
-    case 1: return 3
-    case 2: return 2
+    case 1: return 5
+    case 2: return 3
     case 3: return 1
   }
 }
@@ -32,8 +32,7 @@ export function sortWithTiebreakers(entries: Array<{ playerId: string, total: nu
 }
 
 export function attendancePoint(status: 'present'|'absent'|'unexpected') {
-  if (status === 'present') return 2
-  if (status === 'absent') return 0
+  if (status === 'present') return 1
+  if (status === 'absent') return -1
   return 0
 }
-

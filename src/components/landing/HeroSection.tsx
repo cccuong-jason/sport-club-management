@@ -1,16 +1,17 @@
 'use client'
 
 import { motion, Variants, useScroll, useTransform } from 'framer-motion'
-import { SignInButton } from '@clerk/nextjs'
+import { SignInButton, useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import Image from 'next/image'
 import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
-export function HeroSection({ userId }: { userId: string | null }) {
+export function HeroSection() {
     const sectionRef = useRef<HTMLElement>(null)
     const t = useTranslations('Landing.Hero')
+    const { userId } = useAuth()
     const { scrollYProgress } = useScroll({
         target: sectionRef,
         offset: ["start start", "end start"]

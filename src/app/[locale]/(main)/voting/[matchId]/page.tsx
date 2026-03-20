@@ -2,6 +2,7 @@ import { connectDB } from '@/lib/db'
 import { Vote } from '@/models/Vote'
 import { Event } from '@/models/Event'
 import { User } from '@/models/User'
+import { ClubMember } from '@/models/ClubMember'
 import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { decryptSelections } from '@/lib/crypto'
@@ -11,7 +12,9 @@ import { VotingForm } from '@/components/voting/VotingForm'
 import { announceResults } from '@/app/[locale]/(main)/voting/actions'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { Medal, Eye, EyeOff } from 'lucide-react'
+import { Medal, Eye } from 'lucide-react'
+import { getEligibleClubMemberIds } from '@/lib/leaderboard'
+import { isVotingAvailableForEvent } from '@/lib/events'
 
 export default async function VotingPage(props: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await props.params
@@ -20,7 +23,16 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
   await connectDB()
   const event = await Event.findById(matchId).lean<any>()
   if (!event) return <main className="p-6">Invalid event</main>
-  const members = await User.find().lean<any>().then(users => users.map((u: any) => ({
+  const memberships = await ClubMember.find().lean<any[]>()
+  const eligibleMemberIds = getEligibleClubMemberIds(
+    memberships.map((membership) => ({
+      clubId: String(membership.clubId),
+      userId: String(membership.userId),
+      status: membership.status,
+    })),
+    String(event.clubId)
+  )
+  const members = await User.find({ _id: { $in: eligibleMemberIds } }).lean<any>().then(users => users.map((u: any) => ({
     ...u,
     _id: u._id.toString(),
     createdAt: u.createdAt?.toISOString(),
@@ -35,18 +47,27 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
 
   const hasVoted = voter ? await Vote.exists({ matchId, voterId: voter._id }) : false
   const isUserAdmin = isAdmin(authUser.role)
+  const isVotingOpen = isVotingAvailableForEvent(
+    {
+      type: event.type,
+      date: event.date,
+      startTime: event.startTime,
+      endTime: event.endTime,
+    },
+    new Date()
+  )
 
   async function computeResults() {
     'use server'
     await connectDB()
-    const votes = await Vote.find({ matchId }).lean<any>()
+    const votes = await Vote.find({ matchId, clubId: event.clubId }).lean<any>()
     const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
     for (const v of votes) {
       try {
         const obj = JSON.parse(decryptSelections(v.selectionsEnc))
-        if (obj.first) decoded.push({ playerId: obj.first, placement: 1 })
-        if (obj.second) decoded.push({ playerId: obj.second, placement: 2 })
-        if (obj.third) decoded.push({ playerId: obj.third, placement: 3 })
+        if (obj.first && eligibleMemberIds.includes(obj.first)) decoded.push({ playerId: obj.first, placement: 1 })
+        if (obj.second && eligibleMemberIds.includes(obj.second)) decoded.push({ playerId: obj.second, placement: 2 })
+        if (obj.third && eligibleMemberIds.includes(obj.third)) decoded.push({ playerId: obj.third, placement: 3 })
       } catch { }
     }
     const tallied = tallyVotes(decoded)
@@ -59,7 +80,7 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
     if (!isAdmin(authUser?.role)) return null
 
     await connectDB()
-    const votes = await Vote.find({ matchId }).populate('voterId', 'name email').lean<any>()
+    const votes = await Vote.find({ matchId, clubId: event.clubId }).populate('voterId', 'name email').lean<any>()
 
     return votes.map((v: any) => {
       let selections = { first: '', second: '', third: '' }
@@ -82,7 +103,7 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
   }
 
   // Show results if user has voted OR is admin
-  const showResults = hasVoted || isUserAdmin
+  const showResults = isVotingOpen && (hasVoted || isUserAdmin)
   const results = showResults ? await computeResults() : null
   const detailedVotes = isUserAdmin ? await getAdminDetailedVotes() : null
 
@@ -102,7 +123,18 @@ export default async function VotingPage(props: { params: Promise<{ matchId: str
       </div>
 
       {/* Show Form only if NOT voted */}
-      {!hasVoted && voter && (
+      {!isVotingOpen && (
+        <Card className="rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
+          <CardHeader>
+            <CardTitle className="font-heading uppercase tracking-[0.08em]">Bình chọn chưa mở</CardTitle>
+            <CardDescription>
+              MVP voting will unlock after the scheduled match end time{event.endTime ? ` (${event.endTime})` : ''}.
+            </CardDescription>
+          </CardHeader>
+        </Card>
+      )}
+
+      {isVotingOpen && !hasVoted && voter && (
         <div className="mb-8">
           <VotingForm matchId={matchId} members={members} voterId={String(voter._id)} />
         </div>

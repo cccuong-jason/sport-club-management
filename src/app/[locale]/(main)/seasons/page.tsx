@@ -14,6 +14,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { createSeason } from './actions'
+import Link from 'next/link'
 
 async function listSeasons(clubId?: string) {
   await connectDB()
@@ -26,9 +27,15 @@ export default async function SeasonsPage() {
   const seasons = await listSeasons(authUser?.activeClubId)
   return (
     <main className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight">Seasons</h1>
-        <p className="text-muted-foreground">Manage competitive seasons and view historical leaderboards.</p>
+      <div className="flex items-end justify-between gap-4">
+        <div>
+          <p className="font-heading text-xs uppercase tracking-[0.22em] text-primary">Season Command</p>
+          <h1 className="font-heading text-4xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">Seasons</h1>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">Manage competitive seasons and view historical leaderboards.</p>
+        </div>
+        <Button asChild variant="outline" className="rounded-none border-zinc-300 font-heading uppercase tracking-[0.12em] dark:border-zinc-700">
+          <Link href="/seasons/calendar">Open Calendar</Link>
+        </Button>
       </div>
 
       {isAdmin(authUser?.role) && <CreateSeasonForm />}
@@ -49,9 +56,9 @@ export default async function SeasonsPage() {
 
 function CreateSeasonForm() {
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create New Season</CardTitle>
+    <Card className="overflow-hidden rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
+      <CardHeader className="border-b border-zinc-200/70 bg-gradient-to-r from-primary/12 via-transparent to-transparent dark:border-zinc-800/70 dark:from-primary/15">
+        <CardTitle className="font-heading text-2xl uppercase tracking-[0.08em]">Create New Season</CardTitle>
         <CardDescription>Define a new time range for tracking points and MVP stats.</CardDescription>
       </CardHeader>
       <CardContent>
@@ -148,37 +155,42 @@ async function Leaderboard({ season }: { season: any }) {
     String(season.clubId)
   )
   return (
-    <div className="mt-4 rounded-md border bg-white overflow-hidden">
+    <div className="mt-4 overflow-hidden border border-zinc-200 bg-white/95 shadow-[0_18px_40px_rgba(0,0,0,0.05)] dark:border-zinc-800 dark:bg-zinc-950/90">
       <div className="overflow-x-auto">
         <table className="w-full text-sm">
-          <thead className="bg-blue-800 text-white">
+          <thead className="bg-zinc-950 text-white dark:bg-black">
             <tr>
-              <th className="px-4 py-3 text-left font-bold">Name</th>
-              <th className="px-4 py-3 text-right font-bold">Chuyên cần</th>
-              <th className="px-4 py-3 text-right font-bold">Thái độ thi đấu</th>
-              <th className="px-4 py-3 text-right font-bold">Tiến bộ cá nhân</th>
-              <th className="px-4 py-3 text-right font-bold">Đóng góp ngoài sân</th>
-              <th className="px-4 py-3 text-right font-bold">MVP</th>
-              <th className="px-4 py-3 text-right font-bold bg-green-200 text-black">Điểm</th>
+              <th className="px-4 py-4 text-left font-heading text-xs uppercase tracking-[0.14em]">Name</th>
+              <th className="px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em]">Chuyên cần</th>
+              <th className="px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em]">Thái độ</th>
+              <th className="px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em]">Tiến bộ</th>
+              <th className="px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em]">Ngoài sân</th>
+              <th className="px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em]">MVP</th>
+              <th className="bg-primary px-4 py-4 text-right font-heading text-xs uppercase tracking-[0.14em] text-black">Điểm</th>
             </tr>
           </thead>
-          <tbody className="divide-y">
+          <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
             {entries.length === 0 && (
               <tr>
-                <td colSpan={7} className="p-4 text-center text-muted-foreground">No data recorded for this period.</td>
+                <td colSpan={7} className="p-8 text-center text-muted-foreground">No data recorded for this period.</td>
               </tr>
             )}
             {entries.map((e: any, idx: number) => (
-              <tr key={e.playerId} className="hover:bg-muted/50">
-                <td className="px-4 py-3 font-medium">
-                  {users.find((u: any) => String(u._id) === e.playerId)?.name || e.playerId}
+              <tr key={e.playerId} className="hover:bg-zinc-50 dark:hover:bg-zinc-900/65">
+                <td className="px-4 py-4 font-medium text-zinc-950 dark:text-white">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center border border-primary/30 bg-primary text-xs font-black text-black">
+                      {idx + 1}
+                    </div>
+                    <span>{users.find((u: any) => String(u._id) === e.playerId)?.name || e.playerId}</span>
+                  </div>
                 </td>
-                <td className="px-4 py-3 text-right">{e.attendancePoints}</td>
-                <td className="px-4 py-3 text-right">0</td>
-                <td className="px-4 py-3 text-right">0</td>
-                <td className="px-4 py-3 text-right">0</td>
-                <td className="px-4 py-3 text-right">{e.mvpPoints}</td>
-                <td className="px-4 py-3 text-right font-bold bg-green-100">{e.total.toFixed(1).replace('.0', '')}</td>
+                <td className="px-4 py-4 text-right text-zinc-600 dark:text-zinc-300">{e.attendancePoints}</td>
+                <td className="px-4 py-4 text-right text-zinc-600 dark:text-zinc-300">0</td>
+                <td className="px-4 py-4 text-right text-zinc-600 dark:text-zinc-300">0</td>
+                <td className="px-4 py-4 text-right text-zinc-600 dark:text-zinc-300">0</td>
+                <td className="px-4 py-4 text-right text-zinc-600 dark:text-zinc-300">{e.mvpPoints}</td>
+                <td className="bg-primary/12 px-4 py-4 text-right font-black text-zinc-950 dark:text-white">{e.total.toFixed(1).replace('.0', '')}</td>
               </tr>
             ))}
           </tbody>
@@ -190,11 +202,11 @@ async function Leaderboard({ season }: { season: any }) {
 
 function SeasonRow({ season }: { season: any }) {
   return (
-    <Card>
+    <Card className="overflow-hidden rounded-none border-zinc-200 bg-[linear-gradient(180deg,rgba(194,255,87,0.08),transparent_28%),rgba(255,255,255,0.92)] shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-[linear-gradient(180deg,rgba(194,255,87,0.08),transparent_30%),rgba(5,10,8,0.96)]">
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle>{season.name}</CardTitle>
-          <span className="text-sm text-muted-foreground bg-muted px-2 py-1 rounded">
+          <CardTitle className="font-heading text-3xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">{season.name}</CardTitle>
+          <span className="border border-primary/25 bg-primary/10 px-3 py-2 text-sm text-zinc-700 dark:text-zinc-200">
             {new Date(season.startDate).toLocaleDateString()} — {new Date(season.endDate).toLocaleDateString()}
           </span>
         </div>

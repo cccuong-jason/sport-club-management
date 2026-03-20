@@ -9,12 +9,14 @@ import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { revalidatePath } from 'next/cache'
 import { createNotification } from '@/lib/notifications'
+import { getActiveClubMemberIds } from '@/lib/club-members'
 
 // --- Transactions ---
 
 export async function addTransaction(formData: FormData) {
   const authUser = await getAuthUser()
   if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
+  if (!authUser?.activeClubId) return { success: false, message: 'Active club context is required' }
 
   await connectDB()
 
@@ -28,6 +30,7 @@ export async function addTransaction(formData: FormData) {
 
   try {
     await FundTransaction.create({
+      clubId: authUser.activeClubId,
       type,
       amount,
       date,
@@ -50,6 +53,7 @@ export async function addTransaction(formData: FormData) {
 export async function createMonthlyFund(formData: FormData) {
   const authUser = await getAuthUser()
   if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
+  if (!authUser?.activeClubId) return { success: false, message: 'Active club context is required' }
 
   await connectDB()
 
@@ -60,6 +64,7 @@ export async function createMonthlyFund(formData: FormData) {
   try {
     // 1. Create Request
     const request = await PaymentRequest.create({
+      clubId: authUser.activeClubId,
       type: 'monthly',
       title,
       amount,
@@ -68,10 +73,11 @@ export async function createMonthlyFund(formData: FormData) {
     })
 
     // 2. Assign to all ACTIVE members
-    const members = await User.find({ status: 'active', role: 'member' }).select('_id')
+    const members = await getActiveClubMemberIds(authUser.activeClubId)
     const records = members.map(m => ({
+      clubId: authUser.activeClubId,
       requestId: request._id,
-      userId: m._id,
+      userId: m,
       amount,
       status: 'unpaid'
     }))
@@ -101,6 +107,7 @@ export async function createMonthlyFund(formData: FormData) {
 export async function assignPenalty(formData: FormData) {
   const authUser = await getAuthUser()
   if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
+  if (!authUser?.activeClubId) return { success: false, message: 'Active club context is required' }
 
   await connectDB()
 
@@ -110,6 +117,7 @@ export async function assignPenalty(formData: FormData) {
 
   try {
     const request = await PaymentRequest.create({
+      clubId: authUser.activeClubId,
       type: 'penalty',
       title: reason,
       amount,
@@ -119,6 +127,7 @@ export async function assignPenalty(formData: FormData) {
     })
 
     await PaymentRecord.create({
+      clubId: authUser.activeClubId,
       requestId: request._id,
       userId,
       amount,
@@ -144,6 +153,7 @@ export async function assignPenalty(formData: FormData) {
 export async function markRecordAsPaid(recordId: string) {
   const authUser = await getAuthUser()
   if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
+  if (!authUser?.activeClubId) return { success: false, message: 'Active club context is required' }
 
   await connectDB()
 
@@ -154,6 +164,7 @@ export async function markRecordAsPaid(recordId: string) {
 
     // 1. Create Fund Transaction (Revenue)
     const transaction = await FundTransaction.create({
+      clubId: authUser.activeClubId,
       type: 'contribution',
       amount: record.amount,
       date: new Date(),
@@ -191,7 +202,7 @@ export async function sendReminders(requestId: string) {
 
   try {
     const request = await PaymentRequest.findById(requestId)
-    const unpaidRecords = await PaymentRecord.find({ requestId, status: 'unpaid' })
+    const unpaidRecords = await PaymentRecord.find({ requestId, clubId: request?.clubId, status: 'unpaid' })
 
     const userIds = unpaidRecords.map(r => r.userId.toString())
 

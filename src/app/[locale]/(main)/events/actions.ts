@@ -26,6 +26,8 @@ export async function createEvent(formData: FormData) {
         date: String(formData.get('date') || ''),
         startTime: String(formData.get('startTime') || ''),
         endTime: String(formData.get('endTime') || ''),
+        dateTimeStart: String(formData.get('dateTimeStart') || ''),
+        dateTimeEnd: String(formData.get('dateTimeEnd') || ''),
         location: String(formData.get('location') || ''),
         seasonId,
       },

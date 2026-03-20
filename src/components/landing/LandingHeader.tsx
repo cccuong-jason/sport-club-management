@@ -1,7 +1,7 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { SignInButton } from '@clerk/nextjs'
+import { SignInButton, useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 import { Menu } from 'lucide-react'
@@ -14,8 +14,9 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 
-export function LandingHeader({ userId }: { userId: string | null }) {
+export function LandingHeader() {
     const t = useTranslations('Landing.Header');
+    const { userId } = useAuth()
 
     return (
         <motion.header

@@ -18,6 +18,8 @@ export async function submitVote(matchId: string, formData: FormData) {
   await connectDB()
   const voter = await User.findOne({ clerkId: authUser.clerkId })
   if (!voter) return { success: false, message: 'User not found' }
+  const event = await Event.findById(matchId).select('clubId').lean<any>()
+  if (!event?.clubId) return { success: false, message: 'Match not found' }
 
   const vote = {
     first: String(formData.get('first') || ''),
@@ -43,8 +45,8 @@ export async function submitVote(matchId: string, formData: FormData) {
   const enc = encryptSelections(JSON.stringify(parsed.data))
 
   await Vote.updateOne(
-    { matchId, voterId: voter._id },
-    { selectionsEnc: enc, reasons: [], otherReason: '' },
+    { matchId, voterId: voter._id, clubId: event.clubId },
+    { clubId: event.clubId, selectionsEnc: enc, reasons: [], otherReason: '' },
     { upsert: true }
   )
 
@@ -58,7 +60,7 @@ export async function announceResults(matchId: string) {
 
   await connectDB()
   const event = await Event.findById(matchId).lean<any>()
-  const votes = await Vote.find({ matchId }).lean<any>()
+  const votes = await Vote.find({ matchId, clubId: event?.clubId }).lean<any>()
   const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
 
   for (const v of votes) {

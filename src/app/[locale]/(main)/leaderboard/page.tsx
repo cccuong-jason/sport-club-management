@@ -3,30 +3,47 @@ import { Vote } from '@/models/Vote'
 import { Attendance } from '@/models/Attendance'
 import { User } from '@/models/User'
 import { Season } from '@/models/Season'
+import { ClubMember } from '@/models/ClubMember'
 import { decryptSelections } from '@/lib/crypto'
 import { tallyVotes, sortWithTiebreakers, attendancePoint } from '@/lib/scoring'
 import { isAdmin } from '@/lib/rbac'
 import { getAuthUser } from '@/lib/auth-user'
+import { getEligibleClubMemberIds } from '@/lib/leaderboard'
 
-async function compute(from?: Date, to?: Date) {
+async function compute(clubId?: string, from?: Date, to?: Date) {
   await connectDB()
-  const users = await User.find().lean<any>()
-  const votes = await Vote.find().lean<any>()
+  const memberships = await ClubMember.find().lean<any[]>()
+  const eligibleUserIds = getEligibleClubMemberIds(
+    memberships.map((membership) => ({
+      clubId: String(membership.clubId),
+      userId: String(membership.userId),
+      status: membership.status,
+    })),
+    clubId
+  )
+
+  if (eligibleUserIds.length === 0) {
+    return { users: [], entries: [] }
+  }
+
+  const users = await User.find({ _id: { $in: eligibleUserIds } }).lean<any>()
+  const votes = await Vote.find(clubId ? { clubId } : {}).lean<any>()
   const decoded: Array<{ playerId: string, placement: 1 | 2 | 3 }> = []
   for (const v of votes) {
     const d = JSON.parse(decryptSelections(v.selectionsEnc))
-    decoded.push({ playerId: d.first, placement: 1 })
-    decoded.push({ playerId: d.second, placement: 2 })
-    decoded.push({ playerId: d.third, placement: 3 })
+    if (eligibleUserIds.includes(d.first)) decoded.push({ playerId: d.first, placement: 1 })
+    if (eligibleUserIds.includes(d.second)) decoded.push({ playerId: d.second, placement: 2 })
+    if (eligibleUserIds.includes(d.third)) decoded.push({ playerId: d.third, placement: 3 })
   }
   const voteTallies = tallyVotes(decoded)
-  const attendance = await Attendance.find().lean<any>()
+  const attendance = await Attendance.find(clubId ? { clubId } : {}).lean<any>()
   const attendanceTallies: Record<string, number> = {}
   for (const a of attendance) {
     const created = new Date(a.createdAt)
     if (from && created < from) continue
     if (to && created > to) continue
     const id = String(a.userId)
+    if (!eligibleUserIds.includes(id)) continue
     attendanceTallies[id] = (attendanceTallies[id] || 0) + attendancePoint(a.status)
   }
   const combined = voteTallies.map(v => ({
@@ -50,8 +67,10 @@ async function compute(from?: Date, to?: Date) {
 export default async function LeaderboardPage() {
   const authUser = await getAuthUser()
   const isUserAdmin = isAdmin(authUser?.role)
-  const seasons = isUserAdmin ? await Season.find().sort({ startDate: -1 }).lean<any>() : []
-  const { users, entries } = await compute()
+  const seasons = isUserAdmin && authUser?.activeClubId
+    ? await Season.find({ clubId: authUser.activeClubId }).sort({ startDate: -1 }).lean<any>()
+    : []
+  const { users, entries } = await compute(authUser?.activeClubId)
 
   return (
     <main className="max-w-6xl mx-auto p-6 space-y-6">

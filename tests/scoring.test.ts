@@ -1,4 +1,5 @@
 import { placementPoints, tallyVotes, sortWithTiebreakers } from '@/lib/scoring'
+import { attendancePoint } from '@/lib/scoring'
 
 test('placement points', () => {
   expect(placementPoints(1)).toBe(5)
@@ -19,3 +20,8 @@ test('tally and sort', () => {
   expect(sorted[0].playerId).toBe('A')
 })
 
+test('attendance points follow leaderboard business rules', () => {
+  expect(attendancePoint('present')).toBe(1)
+  expect(attendancePoint('absent')).toBe(-1)
+  expect(attendancePoint('unexpected')).toBe(0)
+})

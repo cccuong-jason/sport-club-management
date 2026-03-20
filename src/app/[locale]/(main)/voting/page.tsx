@@ -8,11 +8,13 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Calendar, MapPin, ExternalLink, Vote as VoteIcon, Trophy, Dumbbell } from 'lucide-react'
 import Link from 'next/link'
+import { getEventLifecycleState } from '@/lib/events'
 
-async function listMatchEvents() {
+async function listMatchEvents(clubId?: string) {
+  if (!clubId) return []
   await connectDB()
-  // Find events of type 'match' or 'training'
   const events = await Event.find({
+    clubId,
     type: { $in: ['match', 'training'] }
   }).sort({ date: -1 }).lean<any>()
   return events.map((m: any) => ({
@@ -24,9 +26,11 @@ async function listMatchEvents() {
   }))
 }
 
-async function getVoteCounts() {
+async function getVoteCounts(clubId?: string) {
+  if (!clubId) return {}
   await connectDB()
   const votes = await Vote.aggregate([
+    { $match: { clubId } },
     { $group: { _id: '$matchId', count: { $sum: 1 } } }
   ])
   const map: Record<string, number> = {}
@@ -36,8 +40,8 @@ async function getVoteCounts() {
 
 export default async function VotingDashboardPage() {
   const authUser = await getAuthUser()
-  const matches = await listMatchEvents()
-  const voteCounts = await getVoteCounts()
+  const matches = await listMatchEvents(authUser?.activeClubId)
+  const voteCounts = await getVoteCounts(authUser?.activeClubId)
   const isUserAdmin = isAdmin(authUser?.role)
 
   return (
@@ -50,7 +54,7 @@ export default async function VotingDashboardPage() {
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {matches.map((match: any) => {
           const voteCount = voteCounts[match._id] || 0
-          const isPast = new Date(match.date) < new Date()
+          const isEnded = getEventLifecycleState(match, new Date()) === 'ended'
 
           return (
             <Card key={match._id} className="flex flex-col">
@@ -60,10 +64,10 @@ export default async function VotingDashboardPage() {
                     {match.type === 'match' ? <Trophy className="h-5 w-5 text-yellow-600" /> : <Dumbbell className="h-5 w-5 text-blue-600" />}
                     {match.title}
                   </CardTitle>
-                  {isPast ? (
+                  {isEnded ? (
                     <Badge variant="secondary">Ended</Badge>
                   ) : (
-                    <Badge variant="default" className="bg-green-600">Active</Badge>
+                    <Badge variant="default" className="bg-zinc-700">Locked</Badge>
                   )}
                 </div>
                 <CardDescription className="flex items-center gap-2 mt-1">

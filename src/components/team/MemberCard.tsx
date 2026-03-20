@@ -98,25 +98,25 @@ export function MemberCard({ member, isAdmin, currentUserId }: Props) {
   const isLeaving = member.status === 'leaving'
 
   return (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-4 gap-3 hover:bg-muted/50 transition-colors overflow-hidden">
+    <div className="flex flex-col gap-3 overflow-hidden p-4 transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/60 sm:flex-row sm:items-center sm:justify-between">
       <div className="flex items-center space-x-4 min-w-0 flex-1">
-        <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-600 to-emerald-800 text-white font-bold text-lg">
+        <div className="flex h-12 w-12 items-center justify-center border border-primary/30 bg-primary text-lg font-black text-black">
           {member.name.charAt(0).toUpperCase()}
         </div>
         <div className="min-w-0 flex-1">
           <div className="flex items-center flex-wrap gap-1.5">
-            <h3 className="font-semibold truncate">{member.name}</h3>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${member.role === 'admin'
-              ? 'bg-emerald-100 text-emerald-800'
-              : 'bg-slate-100 text-slate-800'
+            <h3 className="truncate font-semibold text-zinc-950 dark:text-white">{member.name}</h3>
+            <span className={`flex items-center gap-1 border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.1em] ${member.role === 'admin'
+              ? 'border-primary/30 bg-primary/10 text-zinc-900 dark:text-white'
+              : 'border-zinc-200 bg-zinc-100 text-zinc-800 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-200'
               }`}>
               {member.role === 'admin' ? <><Crown className="h-3 w-3" /> Quản trị viên</> : <><User className="h-3 w-3" /> Thành viên</>}
             </span>
-            <span className={`px-2 py-0.5 rounded-full text-xs font-medium flex items-center gap-1 ${member.status === 'active' ? 'bg-green-100 text-green-800' :
-              member.status === 'unavailable' ? 'bg-yellow-100 text-yellow-800' :
-                member.status === 'leaving' ? 'bg-orange-100 text-orange-800' :
-                  member.status === 'pending_approval' ? 'bg-blue-100 text-blue-800' :
-                    'bg-red-100 text-red-800'
+            <span className={`flex items-center gap-1 border px-2 py-0.5 text-xs font-medium uppercase tracking-[0.1em] ${member.status === 'active' ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-900 dark:bg-green-950/30 dark:text-green-300' :
+              member.status === 'unavailable' ? 'border-yellow-200 bg-yellow-50 text-yellow-700 dark:border-yellow-900 dark:bg-yellow-950/30 dark:text-yellow-300' :
+                member.status === 'leaving' ? 'border-orange-200 bg-orange-50 text-orange-700 dark:border-orange-900 dark:bg-orange-950/30 dark:text-orange-300' :
+                  member.status === 'pending_approval' ? 'border-blue-200 bg-blue-50 text-blue-700 dark:border-blue-900 dark:bg-blue-950/30 dark:text-blue-300' :
+                    'border-red-200 bg-red-50 text-red-700 dark:border-red-900 dark:bg-red-950/30 dark:text-red-300'
               }`}>
               {member.status === 'active' ? <CheckCircle className="h-3 w-3" /> :
                 member.status === 'unavailable' ? <AlertTriangle className="h-3 w-3" /> :

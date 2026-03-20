@@ -16,13 +16,16 @@ export async function markPaid(matchId: string, formData: FormData) {
   await connectDB()
   const user = await User.findOne({ clerkId: authUser.clerkId }).lean<any>()
   if (!user) return { success: false, message: 'User not found' }
+  const match = await Event.findById(matchId).select('clubId').lean<any>()
+  if (!match?.clubId) return { success: false, message: 'Match not found' }
   const amount = parseFloat(String(formData.get('amount') || '0'))
   const reference = String(formData.get('reference') || '')
 
   try {
     await MatchPayment.updateOne(
-      { matchId, userId: user._id },
+      { matchId, userId: user._id, clubId: match.clubId },
       {
+        clubId: match.clubId,
         amount,
         status: 'pending',
         reference: reference || `Payment by ${user.name}`,
@@ -51,8 +54,9 @@ export async function confirmPayment(matchId: string, formData: FormData) {
 
   try {
     await MatchPayment.updateOne(
-      { matchId, userId },
+      { matchId, userId, clubId: match.clubId },
       {
+        clubId: match.clubId,
         amount,
         status: 'paid',
         confirmedBy: authUser?.mongoId,
@@ -63,6 +67,7 @@ export async function confirmPayment(matchId: string, formData: FormData) {
 
     // Create fund transaction for confirmed payment
     await FundTransaction.create({
+      clubId: match.clubId,
       teamId: null,
       type: 'contribution',
       amount,
@@ -95,13 +100,16 @@ export async function rejectPayment(matchId: string, formData: FormData) {
   const authUser = await getAuthUser()
   if (!isAdmin(authUser?.role)) return { success: false, message: 'Unauthorized' }
   await connectDB()
+  const match = await Event.findById(matchId).select('clubId').lean<any>()
+  if (!match?.clubId) return { success: false, message: 'Match not found' }
   const userId = String(formData.get('userId'))
   const adminNote = String(formData.get('adminNote') || '')
 
   try {
     await MatchPayment.updateOne(
-      { matchId, userId },
+      { matchId, userId, clubId: match.clubId },
       {
+        clubId: match.clubId,
         status: 'rejected',
         confirmedBy: authUser?.mongoId,
         confirmedAt: new Date(),

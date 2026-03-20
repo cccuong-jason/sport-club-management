@@ -209,8 +209,8 @@ export function VotingForm({ matchId, members, voterId }: Props) {
       </CardHeader>
       <CardContent>
         <form className="space-y-8">
-          {renderSection('first', 'MVP Hạng 1', 3, 'text-yellow-500')}
-          {renderSection('second', 'MVP Hạng 2', 2, 'text-gray-400')}
+          {renderSection('first', 'MVP Hạng 1', 5, 'text-yellow-500')}
+          {renderSection('second', 'MVP Hạng 2', 3, 'text-gray-400')}
           {renderSection('third', 'MVP Hạng 3', 1, 'text-orange-600')}
 
           <Dialog open={isConfirmOpen} onOpenChange={setIsConfirmOpen}>

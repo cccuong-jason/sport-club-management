@@ -36,10 +36,11 @@ export default async function EventsPage() {
 
   return (
     <main className="space-y-8">
-      <div className="flex items-center justify-between">
+      <div className="flex items-end justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Sự kiện</h1>
-          <p className="text-muted-foreground">Các trận đấu và buổi tập sắp tới.</p>
+          <p className="font-heading text-xs uppercase tracking-[0.22em] text-primary">Event Control</p>
+          <h1 className="font-heading text-4xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">Sự kiện</h1>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">Các trận đấu và buổi tập sắp tới.</p>
         </div>
       </div>
 

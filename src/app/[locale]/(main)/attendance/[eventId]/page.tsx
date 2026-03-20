@@ -1,6 +1,5 @@
 import { connectDB } from '@/lib/db'
 import { Attendance } from '@/models/Attendance'
-import { User } from '@/models/User'
 import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
 import { redirect } from 'next/navigation'
@@ -9,6 +8,7 @@ import { AttendanceRow } from '@/components/attendance/AttendanceRow'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { CheckCircle, XCircle, AlertTriangle, Activity } from 'lucide-react'
 import { Table, TableBody, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { listActiveClubMembers } from '@/lib/club-members'
 
 export default async function AttendancePage(props: { params: Promise<{ eventId: string }> }) {
   const { eventId } = await props.params
@@ -17,13 +17,8 @@ export default async function AttendancePage(props: { params: Promise<{ eventId:
   await connectDB()
 
   const event = await (await import('@/models/Event')).Event.findById(eventId).lean<any>()
-  const users = await User.find().lean<any>().then(users => users.map((u: any) => ({
-    ...u,
-    _id: u._id.toString(),
-    createdAt: u.createdAt?.toISOString(),
-    updatedAt: u.updatedAt?.toISOString()
-  })))
-  const records = await Attendance.find({ eventId }).lean<any>()
+  const users = await listActiveClubMembers(event?.clubId?.toString())
+  const records = await Attendance.find({ eventId, clubId: event?.clubId }).lean<any>()
   const byUser: Record<string, any> = {}
   for (const r of records) byUser[String(r.userId)] = r
 

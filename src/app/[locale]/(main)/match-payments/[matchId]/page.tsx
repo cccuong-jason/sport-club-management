@@ -1,6 +1,5 @@
 import { connectDB } from '@/lib/db'
 import { MatchPayment } from '@/models/MatchPayment'
-import { User } from '@/models/User'
 import { Event } from '@/models/Event'
 import { getAuthUser } from '@/lib/auth-user'
 import { isAdmin } from '@/lib/rbac'
@@ -9,6 +8,7 @@ import { PaymentForm } from '@/components/match-payments/PaymentForm'
 import { PaymentRow } from '@/components/match-payments/PaymentRow'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Users, CheckCircle, Clock, DollarSign } from 'lucide-react'
+import { listActiveClubMembers } from '@/lib/club-members'
 
 export default async function MatchPaymentsPage(props: { params: Promise<{ matchId: string }> }) {
   const { matchId } = await props.params
@@ -20,13 +20,8 @@ export default async function MatchPaymentsPage(props: { params: Promise<{ match
   const match = await Event.findById(matchId).lean<any>()
   if (!match || match.type !== 'match') redirect('/events')
 
-  const users = await User.find().lean<any>().then(users => users.map((u: any) => ({
-    ...u,
-    _id: u._id.toString(),
-    createdAt: u.createdAt?.toISOString(),
-    updatedAt: u.updatedAt?.toISOString()
-  })))
-  const payments = await MatchPayment.find({ matchId }).lean<any>().then(pmts => pmts.map((p: any) => ({
+  const users = await listActiveClubMembers(match.clubId?.toString())
+  const payments = await MatchPayment.find({ matchId, clubId: match.clubId }).lean<any>().then(pmts => pmts.map((p: any) => ({
     ...p,
     _id: p._id.toString(),
     userId: p.userId.toString(),

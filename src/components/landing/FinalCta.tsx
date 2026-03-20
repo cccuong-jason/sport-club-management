@@ -1,14 +1,15 @@
 'use client'
 
 import { motion } from 'framer-motion'
-import { SignInButton } from '@clerk/nextjs'
+import { SignInButton, useAuth } from '@clerk/nextjs'
 import { Button } from '@/components/ui/button'
 import Link from 'next/link'
 
 import { useTranslations } from 'next-intl'
 
-export function FinalCta({ userId }: { userId: string | null }) {
+export function FinalCta() {
     const t = useTranslations('Landing.FinalCta')
+    const { userId } = useAuth()
 
     return (
         <section className="bg-white dark:bg-zinc-950 py-32 relative overflow-hidden border-t border-zinc-200 dark:border-zinc-900">

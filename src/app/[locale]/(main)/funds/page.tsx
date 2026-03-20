@@ -1,6 +1,5 @@
 import { connectDB } from '@/lib/db'
 import { FundTransaction } from '@/models/FundTransaction'
-import { User } from '@/models/User'
 import { PaymentRequest } from '@/models/PaymentRequest'
 import { PaymentRecord } from '@/models/PaymentRecord'
 import { getAuthUser } from '@/lib/auth-user'
@@ -11,16 +10,16 @@ import { MonthlyFundsList } from '@/components/funds/MonthlyFundsList'
 import { PenaltiesList } from '@/components/funds/PenaltiesList'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { DollarSign, TrendingUp, TrendingDown, ArrowUpRight, ArrowDownLeft } from 'lucide-react'
+import { listActiveClubMembers } from '@/lib/club-members'
 
-async function getMembers() {
-  await connectDB()
-  const members = await User.find({ status: 'active' }, '_id name').lean<any>()
-  return members.map((m: any) => ({ ...m, _id: m._id.toString() }))
+async function getMembers(clubId?: string) {
+  const members = await listActiveClubMembers(clubId)
+  return members.map((member: any) => ({ _id: member._id, name: member.name }))
 }
 
-async function listTransactions() {
+async function listTransactions(clubId?: string) {
   await connectDB()
-  const items = await FundTransaction.find().sort({ date: -1 }).lean<any>()
+  const items = await FundTransaction.find(clubId ? { clubId } : {}).sort({ date: -1 }).lean<any>()
   return items.map((i: any) => ({
     ...i,
     _id: i._id.toString(),
@@ -31,12 +30,12 @@ async function listTransactions() {
   }))
 }
 
-async function getMonthlyFunds() {
+async function getMonthlyFunds(clubId?: string) {
   await connectDB()
-  const funds = await PaymentRequest.find({ type: 'monthly' }).sort({ dueDate: -1 }).lean<any>()
+  const funds = await PaymentRequest.find(clubId ? { type: 'monthly', clubId } : { type: 'monthly' }).sort({ dueDate: -1 }).lean<any>()
 
   const fundsWithRecords = await Promise.all(funds.map(async (f: any) => {
-    const records = await PaymentRecord.find({ requestId: f._id }).populate('userId', 'name').lean<any>()
+    const records = await PaymentRecord.find({ requestId: f._id, clubId: f.clubId }).populate('userId', 'name').lean<any>()
 
     // Serialize records
     const serializedRecords = records.map((r: any) => ({
@@ -74,9 +73,9 @@ async function getMonthlyFunds() {
   return fundsWithRecords
 }
 
-async function getPenalties(userId?: string) {
+async function getPenalties(clubId?: string, userId?: string) {
   await connectDB()
-  let query: any = { type: 'penalty' }
+  let query: any = clubId ? { type: 'penalty', clubId } : { type: 'penalty' }
 
   const requests = await PaymentRequest.find(query).sort({ createdAt: -1 }).lean<any>()
 
@@ -102,10 +101,10 @@ async function getPenalties(userId?: string) {
   return penalties.filter(Boolean)
 }
 
-async function getMemberContributions() {
+async function getMemberContributions(clubId?: string) {
   await connectDB()
   const contributions = await FundTransaction.aggregate([
-    { $match: { type: 'contribution' } },
+    { $match: clubId ? { type: 'contribution', clubId } : { type: 'contribution' } },
     {
       $lookup: {
         from: 'users',
@@ -133,11 +132,11 @@ export default async function FundsPage() {
   const isUserAdmin = isAdmin(authUser?.role)
   const userId = authUser?.mongoId
 
-  const items = await listTransactions()
-  const memberContributions = await getMemberContributions()
-  const members = await getMembers()
-  const monthlyFunds = await getMonthlyFunds()
-  const penalties = await getPenalties(isUserAdmin ? undefined : userId)
+  const items = await listTransactions(authUser?.activeClubId)
+  const memberContributions = await getMemberContributions(authUser?.activeClubId)
+  const members = await getMembers(authUser?.activeClubId)
+  const monthlyFunds = await getMonthlyFunds(authUser?.activeClubId)
+  const penalties = await getPenalties(authUser?.activeClubId, isUserAdmin ? undefined : userId)
 
   const balance = items.reduce((acc: number, t: any) => acc + (t.type === 'contribution' ? t.amount : -t.amount), 0)
   const totalContributions = items.filter((t: any) => t.type === 'contribution').reduce((acc: number, t: any) => acc + t.amount, 0)
@@ -149,8 +148,13 @@ export default async function FundsPage() {
 
   const Overview = (
     <div className="space-y-8">
+      <div>
+        <p className="font-heading text-xs uppercase tracking-[0.22em] text-primary">Club Treasury</p>
+        <h1 className="font-heading text-4xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">Quỹ đội bóng</h1>
+        <p className="mt-2 text-zinc-600 dark:text-zinc-300">Quản lý tài chính, quỹ hàng tháng và tiền phạt.</p>
+      </div>
       <div className="grid gap-4 md:grid-cols-3">
-        <Card>
+        <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tổng đóng góp</CardTitle>
             <TrendingUp className="h-4 w-4 text-green-600" />
@@ -159,7 +163,7 @@ export default async function FundsPage() {
             <div className="text-2xl font-bold text-green-600">${totalContributions.toFixed(2)}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Tổng chi tiêu</CardTitle>
             <TrendingDown className="h-4 w-4 text-red-600" />
@@ -168,7 +172,7 @@ export default async function FundsPage() {
             <div className="text-2xl font-bold text-red-600">${totalExpenses.toFixed(2)}</div>
           </CardContent>
         </Card>
-        <Card>
+        <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Số dư hiện tại</CardTitle>
             <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -183,7 +187,7 @@ export default async function FundsPage() {
 
       {/* Personal Contribution Summary */}
       {authUser && (
-        <Card>
+        <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader>
             <CardTitle>Lịch sử đóng góp của bạn</CardTitle>
           </CardHeader>
@@ -225,7 +229,7 @@ export default async function FundsPage() {
       {isUserAdmin && <AddTransactionForm members={members} />}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="col-span-1">
+        <Card className="col-span-1 rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader>
             <CardTitle>Giao dịch gần đây</CardTitle>
           </CardHeader>
@@ -264,7 +268,7 @@ export default async function FundsPage() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-1">
+        <Card className="col-span-1 rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
           <CardHeader>
             <CardTitle>Thành viên đóng góp tích cực</CardTitle>
           </CardHeader>

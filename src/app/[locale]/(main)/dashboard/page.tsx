@@ -51,16 +51,18 @@ export default async function DashboardPage() {
   const attendanceRate = totalPossible > 0 ? Math.round((totalActual / totalPossible) * 100) : 0
 
   return (
-    <div className="flex-1 space-y-4 p-4 pt-6">
-      <div className="flex items-center justify-between space-y-2">
-        <h2 className="text-3xl font-bold tracking-tight">Bảng điều khiển</h2>
+    <div className="flex-1 space-y-6">
+      <div className="flex items-end justify-between space-y-2">
+        <div>
+          <p className="font-heading text-xs uppercase tracking-[0.22em] text-primary">Club Pulse</p>
+          <h2 className="font-heading text-4xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">Bảng điều khiển</h2>
+        </div>
         <div className="flex items-center space-x-2">
-          {/* Calendar Date Range Picker could go here */}
           <Button>Tải báo cáo</Button>
         </div>
       </div>
       <Tabs defaultValue="overview" className="space-y-4">
-        <TabsList>
+        <TabsList className="rounded-none border border-zinc-200 bg-white/70 dark:border-zinc-800 dark:bg-zinc-950/70">
           <TabsTrigger value="overview">Tổng quan</TabsTrigger>
           <TabsTrigger value="analytics" disabled>Phân tích</TabsTrigger>
           <TabsTrigger value="reports" disabled>Báo cáo</TabsTrigger>
@@ -68,9 +70,9 @@ export default async function DashboardPage() {
         </TabsList>
         <TabsContent value="overview" className="space-y-4">
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <Card>
+            <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
+                <CardTitle className="text-sm font-medium uppercase tracking-[0.12em]">
                   Tổng quỹ
                 </CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
@@ -82,7 +84,7 @@ export default async function DashboardPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Cầu thủ hoạt động
@@ -96,7 +98,7 @@ export default async function DashboardPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">Tỷ lệ tham gia</CardTitle>
                 <Activity className="h-4 w-4 text-muted-foreground" />
@@ -108,7 +110,7 @@ export default async function DashboardPage() {
                 </p>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   Sự kiện đã tổ chức
@@ -124,7 +126,7 @@ export default async function DashboardPage() {
             </Card>
           </div>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-            <Card className="col-span-4">
+            <Card className="col-span-4 rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader>
                 <CardTitle>Tổng quan điểm danh</CardTitle>
                 <CardDescription>
@@ -135,7 +137,7 @@ export default async function DashboardPage() {
                 <Overview data={attendanceData} />
               </CardContent>
             </Card>
-            <Card className="col-span-3">
+            <Card className="col-span-3 rounded-none border-zinc-200 bg-white/85 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
               <CardHeader>
                 <CardTitle>Giao dịch gần đây</CardTitle>
                 <CardDescription>

@@ -30,8 +30,9 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
     <div className="space-y-8">
       <div className="flex flex-col md:flex-row items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Danh sách thành viên</h1>
-          <p className="text-muted-foreground mt-1">{totalMembers} thành viên • {adminCount} quản trị viên</p>
+          <p className="font-heading text-xs uppercase tracking-[0.22em] text-primary">Roster Control</p>
+          <h1 className="font-heading text-4xl uppercase tracking-[0.06em] text-zinc-950 dark:text-white">Danh sách thành viên</h1>
+          <p className="mt-2 text-zinc-600 dark:text-zinc-300">{totalMembers} thành viên • {adminCount} quản trị viên</p>
         </div>
         <div className="flex items-center gap-2 w-full md:w-auto">
           <div className="relative flex-1 md:w-64">
@@ -49,9 +50,9 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
       {isAdmin && <AddMemberForm />}
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <Card className="col-span-1 h-fit">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="flex items-center text-lg text-emerald-800">
+        <Card className="col-span-1 h-fit overflow-hidden rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
+          <CardHeader className="border-b border-zinc-200/70 bg-gradient-to-r from-primary/12 via-transparent to-transparent dark:border-zinc-800/70 dark:from-primary/15">
+            <CardTitle className="flex items-center font-heading text-lg uppercase tracking-[0.1em] text-zinc-950 dark:text-white">
               <Shield className="mr-2 h-5 w-5" />
               Ban quản lý
             </CardTitle>
@@ -71,9 +72,9 @@ export function TeamList({ members, isAdmin, currentUserId }: TeamListProps) {
           </CardContent>
         </Card>
 
-        <Card className="col-span-1 h-fit">
-          <CardHeader className="border-b bg-muted/20">
-            <CardTitle className="flex items-center text-lg text-slate-800">
+        <Card className="col-span-1 h-fit overflow-hidden rounded-none border-zinc-200 bg-white/90 shadow-[0_18px_40px_rgba(0,0,0,0.06)] dark:border-zinc-800 dark:bg-zinc-950/85">
+          <CardHeader className="border-b border-zinc-200/70 bg-gradient-to-r from-primary/12 via-transparent to-transparent dark:border-zinc-800/70 dark:from-primary/15">
+            <CardTitle className="flex items-center font-heading text-lg uppercase tracking-[0.1em] text-zinc-950 dark:text-white">
               <Users className="mr-2 h-5 w-5" />
               Cầu thủ
             </CardTitle>

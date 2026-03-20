@@ -2,16 +2,9 @@
 
 import * as React from "react"
 import {
-  Calendar,
   ChevronUp,
-  LayoutDashboard,
-  Users,
-  Wallet,
   Trophy,
-  List,
-  BarChart,
   LogOut,
-  CreditCard,
   User
 } from "lucide-react"
 import { useUser, useClerk } from "@clerk/nextjs"
@@ -20,6 +13,7 @@ import { usePathname } from "next/navigation"
 import { setClubContextAction } from "@/app/[locale]/(main)/settings/actions"
 import { AuthUser, ClubMembership } from "@/lib/auth-user"
 import { ChevronsUpDown, Check } from "lucide-react"
+import { getPrimaryNavigationItems } from "@/lib/navigation"
 import {
   Sidebar,
   SidebarContent,
@@ -46,16 +40,7 @@ export function AppSidebar({ authUser }: { authUser: AuthUser }) {
   const { signOut } = useClerk()
   const pathname = usePathname()
 
-  const items = [
-    { title: "Bảng điều khiển", url: "/dashboard", icon: LayoutDashboard },
-    { title: "Đội bóng", url: "/team", icon: Users },
-    { title: "Sự kiện", url: "/events", icon: Trophy },
-    { title: "Mùa giải", url: "/seasons", icon: List },
-    { title: "Lịch", url: "/calendar", icon: Calendar },
-    { title: "Bình chọn", url: "/voting", icon: CreditCard },
-    { title: "Quỹ", url: "/funds", icon: Wallet },
-    { title: "Báo cáo", url: "/reports/attendance", icon: BarChart },
-  ]
+  const items = getPrimaryNavigationItems()
 
   // Helper to check active state
   const isActive = (url: string) => {
@@ -70,14 +55,14 @@ export function AppSidebar({ authUser }: { authUser: AuthUser }) {
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
               size="lg"
-              className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              className="rounded-none border border-zinc-800 bg-zinc-950/90 text-white data-[state=open]:bg-primary data-[state=open]:text-black"
             >
-              <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-primary text-primary-foreground">
+              <div className="flex aspect-square size-8 items-center justify-center rounded-none border border-primary/30 bg-primary text-black">
                 <Trophy className="size-4" />
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-semibold uppercase">{authUser?.activeClubName || "No Club Selected"}</span>
-                <span className="truncate text-xs capitalize">{authUser?.activeClubSport || "Select a club"}</span>
+                <span className="truncate font-heading text-xs font-black uppercase tracking-[0.2em]">{authUser?.activeClubName || "No Club Selected"}</span>
+                <span className="truncate text-[11px] uppercase tracking-[0.18em] text-zinc-400">{authUser?.activeClubSport || "Select a club"}</span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -88,7 +73,7 @@ export function AppSidebar({ authUser }: { authUser: AuthUser }) {
             side="bottom"
             sideOffset={4}
           >
-            <div className="text-xs font-medium text-slate-500 px-2 py-1.5 uppercase">Switch Club</div>
+            <div className="px-2 py-1.5 text-xs font-medium uppercase tracking-[0.18em] text-zinc-500">Switch Club</div>
             {authUser.memberships.map((membership: ClubMembership) => (
               <DropdownMenuItem
                 key={membership.clubId}
@@ -113,12 +98,16 @@ export function AppSidebar({ authUser }: { authUser: AuthUser }) {
       <SidebarSeparator />
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Menu</SidebarGroupLabel>
+          <SidebarGroupLabel className="font-heading text-[11px] uppercase tracking-[0.22em] text-zinc-500">Command</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild isActive={isActive(item.url)}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={isActive(item.url)}
+                    className="rounded-none border border-transparent font-medium uppercase tracking-[0.08em] hover:border-zinc-800 hover:bg-zinc-950/70 hover:text-white data-[active=true]:border-primary/40 data-[active=true]:bg-primary data-[active=true]:text-black"
+                  >
                     <Link href={item.url}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -135,10 +124,10 @@ export function AppSidebar({ authUser }: { authUser: AuthUser }) {
           <SidebarMenuItem>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <SidebarMenuButton className="h-12">
-                  <Avatar className="h-8 w-8 rounded-lg">
+                <SidebarMenuButton className="h-12 rounded-none border border-zinc-800 bg-zinc-950/85 text-white">
+                  <Avatar className="h-8 w-8 rounded-none border border-primary/20">
                     <AvatarImage src={user?.imageUrl || ""} alt={user?.fullName || ""} />
-                    <AvatarFallback className="rounded-lg">
+                    <AvatarFallback className="rounded-none bg-primary text-black">
                       {user?.fullName?.charAt(0).toUpperCase()}
                     </AvatarFallback>
                   </Avatar>
