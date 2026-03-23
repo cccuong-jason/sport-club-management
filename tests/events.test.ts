@@ -81,3 +81,23 @@ test('validateEventFormInput rejects invalid event data', () => {
     })
   ).toThrow('Invalid event data')
 })
+
+test('buildEventCreateInput rejects users without an active club', () => {
+  expect(() =>
+    buildEventCreateInput(
+      {
+        title: 'Friendly Match',
+        type: 'match',
+        date: '2026-03-20T12:00:00.000Z',
+        startTime: '19:00',
+        endTime: '21:00',
+        location: 'Main Stadium',
+        seasonId: '507f191e810c19729de860ef',
+      },
+      {
+        ...adminUser,
+        activeClubId: undefined,
+      }
+    )
+  ).toThrow('Active club context is required')
+})

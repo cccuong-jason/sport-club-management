@@ -58,7 +58,7 @@ export function TestimonialsSection() {
                             className="flex flex-col justify-between bg-white dark:bg-zinc-900 rounded-none p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl hover:border-primary/30 dark:hover:border-primary/30 transition-colors duration-300"
                         >
                             <p className="text-lg leading-relaxed text-zinc-600 dark:text-zinc-300 font-sans italic mb-10">
-                                "{testimonial.body}"
+                                &ldquo;{testimonial.body}&rdquo;
                             </p>
                             <div className="flex items-center gap-x-5 mt-auto pt-6 border-t border-zinc-200 dark:border-zinc-800/50">
                                 <div className="h-14 w-14 rounded-none bg-zinc-50 dark:bg-zinc-950 flex items-center justify-center text-primary font-black font-heading border border-zinc-200 dark:border-zinc-800">

@@ -70,11 +70,13 @@
 
   body {
     @apply bg-background text-foreground;
+    font-family: "Work Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
   }
 }
 
 @layer utilities {
   .font-heading {
+    font-family: Anton, Impact, "Arial Narrow Bold", "Segoe UI", sans-serif;
     letter-spacing: 0.06em;
   }
 }

@@ -14,3 +14,12 @@ test('getEligibleClubMemberIds keeps only active members from the active club', 
 
   expect(ids).toEqual(['user-1'])
 })
+
+test('returns an empty list when no club id is provided', () => {
+  expect(
+    getEligibleClubMemberIds(
+      [{ clubId: 'club-a', userId: 'user-1', status: 'active' }],
+      undefined
+    )
+  ).toEqual([])
+})

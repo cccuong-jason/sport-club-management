@@ -70,3 +70,21 @@ test('validateSeasonFormInput rejects an end date before the start date', () => 
     })
   ).toThrow('End date must be on or after start date')
 })
+
+test('validateSeasonFormInput trims the name and rejects missing values', () => {
+  expect(
+    validateSeasonFormInput({
+      name: '  Summer 2026  ',
+      startDate: '2026-06-01',
+      endDate: '2026-08-31',
+    }).name
+  ).toBe('Summer 2026')
+
+  expect(() =>
+    validateSeasonFormInput({
+      name: '   ',
+      startDate: '2026-06-01',
+      endDate: '2026-08-31',
+    })
+  ).toThrow('Season name is required')
+})

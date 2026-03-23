@@ -248,22 +248,22 @@ export function HeroSection({ userId }: { userId: string | null }) {
                     className="flex whitespace-nowrap gap-12 font-heading text-sm font-bold text-zinc-400 uppercase tracking-[0.2em] px-6"
                 >
                     <span className="text-white">{t('ticker.alex')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.match')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.players')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.dues')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.sarah')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     {/* Duplicate sequence */}
                     <span className="text-white">{t('ticker.alex')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.match')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.players')}</span>
-                    <span className="text-primary">///</span>
+                    <span className="text-primary">{'///'}</span>
                     <span className="text-white">{t('ticker.dues')}</span>
                 </motion.div>
             </div>

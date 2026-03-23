@@ -1,19 +1,5 @@
 import '../globals.css'
-import { Anton, Work_Sans } from 'next/font/google'
 import type { ReactNode } from 'react'
-
-const anton = Anton({
-  weight: '400',
-  subsets: ['latin', 'vietnamese'],
-  display: 'swap',
-  variable: '--font-anton',
-})
-
-const workSans = Work_Sans({
-  subsets: ['latin', 'vietnamese'],
-  display: 'swap',
-  variable: '--font-work-sans',
-})
 import {
   ClerkProvider,
   SignInButton,
@@ -40,7 +26,7 @@ export default async function RootLayout({
   const messages = await getMessages();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${anton.variable} ${workSans.variable}`}>
+    <html lang={locale} suppressHydrationWarning>
       <body className="min-h-screen bg-background text-foreground font-sans antialiased">
         <ClerkProvider>
           <NextIntlClientProvider messages={messages}>
