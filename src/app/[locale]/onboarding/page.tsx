@@ -29,7 +29,7 @@ export default async function OnboardingPage() {
                     Welcome to the Club.
                 </h1>
                 <p className="text-lg leading-7 text-slate-600 font-sans max-w-2xl mx-auto">
-                    Before we drop you into the dashboard, tell us how you'll be using the platform.
+                    Before we drop you into the dashboard, tell us how you&apos;ll be using the platform.
                 </p>
 
                 <OnboardingOptions />
