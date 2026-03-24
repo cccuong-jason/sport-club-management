@@ -1,33 +1,33 @@
-version: '3.8'
-
 services:
   app:
     container_name: sport-club-app
     build:
       context: .
       dockerfile: Dockerfile
-    restart: always
+    restart: unless-stopped
     ports:
       - "3000:3000"
-    # environment:
-    #   - NODE_ENV=dev
-    #   # Point to the local mongo container service
-    #   - MONGODB_URI=mongodb://mongo:27017/football-club
-    #   - NEXTAUTH_SECRET=test
-    #   - NEXTAUTH_URL=http://localhost:3000
     env_file:
-      - .env.local
+      - .env.docker
+      - path: .env.local
+        required: false
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
 
   mongo:
     container_name: football-club-mongo
     image: mongo:latest
-    restart: always
+    restart: unless-stopped
     ports:
       - "27018:27017"
     volumes:
       - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
 volumes:
   mongo_data:

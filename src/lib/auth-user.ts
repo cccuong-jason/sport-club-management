@@ -4,6 +4,7 @@ import { User } from '@/models/User'
 import { ClubMember } from '@/models/ClubMember'
 import { Club } from '@/models/Club'
 import { cookies } from 'next/headers'
+import { isClerkConfigured } from '@/lib/clerk-env'
 
 export type ClubMembership = {
     clubId: string
@@ -38,6 +39,8 @@ export type AuthUser = {
  * their MongoDB User record via their email address.
  */
 export async function getAuthUser(): Promise<AuthUser | null> {
+    if (!isClerkConfigured()) return null
+
     const { userId } = await auth()
     if (!userId) return null
 

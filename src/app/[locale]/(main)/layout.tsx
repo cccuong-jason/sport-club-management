@@ -20,6 +20,9 @@ import { NotificationCenter } from "@/components/notifications/NotificationCente
 
 export default async function MainLayout({ children }: { children: React.ReactNode }) {
   const user = await getAuthUser()
+  if (!user) {
+    redirect('/')
+  }
   if (user?.status === 'onboarding') {
     redirect('/onboarding')
   }
