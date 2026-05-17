@@ -28,7 +28,7 @@ export function LandingHeader({
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-            className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"
+            className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-xl bg-white/95 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"
         >
             <div className="container mx-auto px-6 h-20 flex items-center justify-between">
 
@@ -59,7 +59,7 @@ export function LandingHeader({
                     <LanguageSwitcher />
                     <ModeToggle />
                     {userId ? (
-                        <Button asChild className="bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold px-6 rounded-none uppercase tracking-wider text-sm transition-colors border border-transparent hover:border-zinc-200">
+                        <Button asChild className="bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold px-6 rounded-none uppercase tracking-wider text-sm transition-colors border border-transparent hover:border-zinc-200 min-w-[140px]">
                             <Link href="/dashboard">{t('dashboard')}</Link>
                         </Button>
                     ) : (
@@ -121,7 +121,7 @@ function UnauthenticatedCta({
     fullWidth?: boolean
     authEnabled?: boolean
 }) {
-    const className = `${fullWidth ? 'w-full ' : ''}bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold rounded-none uppercase tracking-wider ${size === 'lg' ? 'px-6 text-lg ' : 'px-6 text-sm '}transition-colors border border-transparent hover:border-zinc-200`
+    const className = `${fullWidth ? 'w-full ' : 'min-w-[140px] '}bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold rounded-none uppercase tracking-wider ${size === 'lg' ? 'px-6 text-lg ' : 'px-6 text-sm '}transition-colors border border-transparent hover:border-zinc-200`
 
     if (authEnabled) {
         return (

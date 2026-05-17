@@ -2,26 +2,32 @@ COMPOSE ?= docker compose
 NPM ?= npm
 APP_SERVICE ?= app
 
+# On Windows, Makefile needs pwsh to find aliases
+ifeq ($(OS),Windows_NT)
+    SHELL := pwsh.exe
+    .SHELLFLAGS := -NoProfile -Command
+endif
+
 .DEFAULT_GOAL := help
 
 .PHONY: help install dev build start lint test verify docker-build docker-up docker-down docker-logs docker-ps docker-restart docker-shell
 
 help:
-	@echo Available targets:
-	@echo   install        Install Node dependencies
-	@echo   dev            Start the local Next.js dev server
-	@echo   build          Build the Next.js app
-	@echo   start          Start the built Next.js app
-	@echo   lint           Run lint checks
-	@echo   test           Run Jest tests
-	@echo   verify         Run lint, test, and build
-	@echo   docker-build   Build the application container image
-	@echo   docker-up      Start the full container stack in the background
-	@echo   docker-down    Stop the full container stack
-	@echo   docker-logs    Tail app container logs
-	@echo   docker-ps      Show running compose services
-	@echo   docker-restart Recreate the full container stack
-	@echo   docker-shell   Open a shell in the app container
+	@echo 'Available targets:'
+	@echo '  install        Install Node dependencies'
+	@echo '  dev            Start the local Next.js dev server'
+	@echo '  build          Build the Next.js app'
+	@echo '  start          Start the built Next.js app'
+	@echo '  lint           Run lint checks'
+	@echo '  test           Run Jest tests'
+	@echo '  verify         Run lint, test, and build'
+	@echo '  docker-build   Build the application container image'
+	@echo '  docker-up      Start the full container stack in the background'
+	@echo '  docker-down    Stop the full container stack'
+	@echo '  docker-logs    Tail app container logs'
+	@echo '  docker-ps      Show running compose services'
+	@echo '  docker-restart Recreate the full container stack'
+	@echo '  docker-shell   Open a shell in the app container'
 
 install:
 	$(NPM) ci

@@ -136,3 +136,20 @@ export async function joinClubAction(clubId: string) {
     revalidatePath('/dashboard')
     redirect('/onboarding/pending')
 }
+
+export async function exploreCommunityAction() {
+    const user = await getAuthUser()
+    if (!user) return { success: false, message: "Unauthorized" }
+
+    await connectDB()
+
+    try {
+        await User.findByIdAndUpdate(user.mongoId, { onboardingCompleted: true })
+    } catch (error) {
+        console.error(error)
+        return { success: false, message: "Failed to update profile." }
+    }
+
+    revalidatePath('/onboarding')
+    redirect('/community')
+}

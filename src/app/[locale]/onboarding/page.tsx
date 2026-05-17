@@ -14,6 +14,9 @@ export default async function OnboardingPage() {
     if (user.status === 'active') {
         redirect('/dashboard')
     }
+    if (user.status === 'free_agent') {
+        redirect('/community')
+    }
     if (user.status === 'pending_approval') {
         redirect('/onboarding/pending')
     }

@@ -1,6 +1,9 @@
+@import url('https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@import "~@uploadthing/react/styles.css";
 
 @layer base {
   :root {
@@ -76,7 +79,21 @@
 
 @layer utilities {
   .font-heading {
-    font-family: Anton, Impact, "Arial Narrow Bold", "Segoe UI", sans-serif;
-    letter-spacing: 0.06em;
+    font-family: Oswald, Anton, Impact, "Arial Narrow Bold", "Segoe UI", sans-serif;
+    letter-spacing: 0.02em;
+  }
+
+  @keyframes slide {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .animate-slide {
+    animation: slide 30s linear infinite;
   }
 }
+

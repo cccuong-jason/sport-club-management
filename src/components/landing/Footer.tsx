@@ -12,20 +12,20 @@ export function Footer() {
     return (
         <footer className="relative bg-zinc-50 dark:bg-zinc-950 overflow-hidden w-full h-[800px] flex flex-col justify-end">
             {/* Background Image replicating the grass/pitch base in the screenshot */}
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 bg-white dark:bg-zinc-950">
                 <Image
                     src="/landing/hero-bg.png"
                     alt="Stadium Grass Background"
                     fill
                     priority
-                    className="object-cover object-bottom opacity-20 dark:opacity-100"
+                    className="object-cover object-bottom opacity-[0.03] dark:opacity-80 mix-blend-multiply dark:mix-blend-lighten grayscale dark:grayscale-0"
                 />
                 {/* Fade to black gradient overlaying the grass going down */}
-                <div className="absolute inset-0 bg-gradient-to-b from-zinc-50/20 via-zinc-50/80 to-zinc-50 dark:from-zinc-950/20 dark:via-zinc-950/80 dark:to-zinc-950" />
+                <div className="absolute inset-0 bg-gradient-to-b from-white via-white/80 to-white dark:from-zinc-950 dark:via-zinc-950/40 dark:to-zinc-950" />
             </div>
 
             <div className="relative z-10 w-full flex flex-col items-center justify-center -mt-64 mb-32 px-6">
-                <span className="text-zinc-600 dark:text-zinc-300 font-bold uppercase tracking-widest text-xs mb-6 font-mono">
+                <span className="text-zinc-800 dark:text-zinc-300 font-bold uppercase tracking-widest text-sm mb-6 font-mono">
                     {t('sloganTop')}
                 </span>
 
@@ -38,18 +38,18 @@ export function Footer() {
                 </Button>
             </div>
 
-            <div className="relative z-10 container mx-auto px-6 lg:px-8 pb-20 border-b border-zinc-300/40 dark:border-zinc-800/40">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 lg:gap-24">
+            <div className="relative z-10 container mx-auto px-6 lg:px-8 pb-20 border-b border-zinc-200/80 dark:border-zinc-800/40">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-16">
                     <div>
-                        <p className="text-sm font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest font-mono leading-relaxed"
+                        <p className="text-lg lg:text-xl font-black text-zinc-800 dark:text-zinc-400 uppercase tracking-widest font-heading leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: t('quotes.1') }} />
                     </div>
                     <div className="text-center md:text-left">
-                        <p className="text-sm font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest font-mono leading-relaxed"
+                        <p className="text-lg lg:text-xl font-black text-zinc-800 dark:text-zinc-400 uppercase tracking-widest font-heading leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: t('quotes.2') }} />
                     </div>
                     <div className="text-right md:text-left">
-                        <p className="text-sm font-bold text-zinc-600 dark:text-zinc-400 uppercase tracking-widest font-mono leading-relaxed whitespace-nowrap"
+                        <p className="text-lg lg:text-xl font-black text-zinc-800 dark:text-zinc-400 uppercase tracking-widest font-heading leading-relaxed whitespace-nowrap"
                             dangerouslySetInnerHTML={{ __html: t('quotes.3') }} />
                     </div>
                 </div>

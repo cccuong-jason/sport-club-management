@@ -166,5 +166,9 @@
             },
             "copyright": "©GOALZ. ALL RIGHTS RESERVED."
         }
+    },
+    "Community": {
+        "feedTitle": "Global Community Feed",
+        "feedDescription": "Discover clubs, players, and matches near you."
     }
 }

@@ -24,7 +24,7 @@ export type AuthUser = {
 
     // The currently active or default club context for legacy/incremental compatibility
     role: 'admin' | 'member'
-    status: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding'
+    status: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' | 'free_agent'
     activeClubId?: string
     activeClubName?: string
     activeClubSport?: string
@@ -118,7 +118,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     const ctxPref = cookieStore.get('active_club_context')?.value
 
     let defaultRole: 'admin' | 'member' = 'member'
-    let defaultStatus: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' = 'onboarding'
+    let defaultStatus: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' | 'free_agent' = dbUser.onboardingCompleted ? 'free_agent' : 'onboarding'
     let activeClubId: string | undefined = undefined
     let activeClubName: string | undefined = undefined
     let activeClubSport: string | undefined = undefined
