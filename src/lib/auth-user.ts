@@ -4,6 +4,7 @@ import { User } from '@/models/User'
 import { ClubMember } from '@/models/ClubMember'
 import { Club } from '@/models/Club'
 import { cookies } from 'next/headers'
+import { isClerkConfigured } from '@/lib/clerk-env'
 
 export type ClubMembership = {
     clubId: string
@@ -23,7 +24,7 @@ export type AuthUser = {
 
     // The currently active or default club context for legacy/incremental compatibility
     role: 'admin' | 'member'
-    status: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding'
+    status: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' | 'free_agent'
     activeClubId?: string
     activeClubName?: string
     activeClubSport?: string
@@ -38,6 +39,8 @@ export type AuthUser = {
  * their MongoDB User record via their email address.
  */
 export async function getAuthUser(): Promise<AuthUser | null> {
+    if (!isClerkConfigured()) return null
+
     const { userId } = await auth()
     if (!userId) return null
 
@@ -115,7 +118,7 @@ export async function getAuthUser(): Promise<AuthUser | null> {
     const ctxPref = cookieStore.get('active_club_context')?.value
 
     let defaultRole: 'admin' | 'member' = 'member'
-    let defaultStatus: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' = 'onboarding'
+    let defaultStatus: 'active' | 'inactive' | 'unavailable' | 'pending_approval' | 'onboarding' | 'free_agent' = dbUser.onboardingCompleted ? 'free_agent' : 'onboarding'
     let activeClubId: string | undefined = undefined
     let activeClubName: string | undefined = undefined
     let activeClubSport: string | undefined = undefined

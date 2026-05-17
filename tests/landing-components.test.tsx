@@ -118,6 +118,18 @@ test('LandingHeader swaps between sign-in and dashboard actions', () => {
   expect(screen.getAllByText('Dashboard')).toHaveLength(2)
 })
 
+test('Landing auth CTAs fall back to links when Clerk is disabled', () => {
+  const { rerender } = render(<LandingHeader userId={null} authEnabled={false} />)
+
+  expect(screen.getAllByRole('link', { name: 'Get started' })[0]).toHaveAttribute('href', '/sign-in')
+
+  rerender(<HeroSection userId={null} authEnabled={false} />)
+  expect(screen.getByRole('link', { name: 'Get started free' })).toHaveAttribute('href', '/sign-in')
+
+  rerender(<FinalCta userId={null} authEnabled={false} />)
+  expect(screen.getByRole('link', { name: 'Start free' })).toHaveAttribute('href', '/sign-in')
+})
+
 test('HeroSection and FinalCta render the authenticated and unauthenticated CTAs', () => {
   const { rerender } = render(<HeroSection userId={null} />)
 

@@ -8,7 +8,13 @@ import Image from 'next/image'
 import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
-export function HeroSection({ userId }: { userId: string | null }) {
+export function HeroSection({
+    userId,
+    authEnabled = true,
+}: {
+    userId: string | null
+    authEnabled?: boolean
+}) {
     const sectionRef = useRef<HTMLElement>(null)
     const t = useTranslations('Landing.Hero')
     const { scrollYProgress } = useScroll({
@@ -54,23 +60,23 @@ export function HeroSection({ userId }: { userId: string | null }) {
 
     return (
         <section ref={sectionRef} className="relative overflow-hidden bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white min-h-screen flex items-center">
-            <div className="absolute inset-0 z-0">
+            <div className="absolute inset-0 z-0 bg-white dark:bg-zinc-950">
                 <Image
                     src="/landing/hero-bg.png"
                     alt="Stadium Background"
                     fill
                     priority
-                    className="object-cover object-center opacity-10 dark:opacity-30"
+                    className="object-cover object-center opacity-[0.03] dark:opacity-50 mix-blend-multiply dark:mix-blend-lighten grayscale dark:grayscale-0"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-white/90 via-white/80 to-transparent dark:from-zinc-950/90 dark:via-zinc-950/50 dark:to-transparent" />
-                <div className="absolute inset-0 bg-white/20 dark:bg-zinc-950/20 mix-blend-multiply" />
+                <div className="absolute inset-0 bg-gradient-to-t from-white via-white/80 to-transparent dark:from-zinc-950/90 dark:via-zinc-950/50 dark:to-transparent" />
+                <div className="absolute inset-0 bg-white/50 dark:bg-zinc-950/20" />
             </div>
 
             {/* Massive Background Text Masks for Depth - With Parallax */}
             <div className="absolute inset-0 z-0 flex flex-col items-center justify-center pointer-events-none overflow-hidden select-none">
                 <motion.div
                     style={{ y: y1 }}
-                    className="text-[15vw] font-black leading-none tracking-tighter uppercase font-heading whitespace-nowrap text-zinc-900/10 dark:text-white/10"
+                    className="text-[12vw] font-black leading-none tracking-tighter uppercase font-heading whitespace-nowrap text-zinc-900/5 dark:text-white/10"
                 >
                     {t('training')}
                 </motion.div>
@@ -113,11 +119,7 @@ export function HeroSection({ userId }: { userId: string | null }) {
                                     <Link href="/dashboard">{t('returnToDashboard')}</Link>
                                 </Button>
                             ) : (
-                                <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                                    <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
-                                        {t('getStartedFree')}
-                                    </Button>
-                                </SignInButton>
+                                <UnauthenticatedHeroCta authEnabled={authEnabled} label={t('getStartedFree')} />
                             )}
 
                             <a href="#features" className="text-sm font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors flex items-center gap-2 group py-2">
@@ -236,37 +238,55 @@ export function HeroSection({ userId }: { userId: string | null }) {
             </div>
 
             {/* Scrolling Ticker Grounding */}
-            <div className="absolute bottom-0 w-full overflow-hidden bg-white/80 dark:bg-black/80 border-t border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-md py-4 z-20">
-                <motion.div
-                    animate={{ x: [0, -1000] }}
-                    transition={{
-                        repeat: Infinity,
-                        repeatType: "loop",
-                        duration: 30,
-                        ease: "linear",
-                    }}
-                    className="flex whitespace-nowrap gap-12 font-heading text-sm font-bold text-zinc-400 uppercase tracking-[0.2em] px-6"
-                >
-                    <span className="text-white">{t('ticker.alex')}</span>
+            <div className="absolute bottom-0 w-full overflow-hidden bg-white/95 dark:bg-black/90 border-t border-zinc-200/80 dark:border-zinc-800/80 backdrop-blur-md py-4 z-20">
+                <div className="flex animate-slide whitespace-nowrap gap-12 font-heading text-sm font-bold text-zinc-400 uppercase tracking-[0.2em] px-6 w-max">
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.alex')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.match')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.match')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.players')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.players')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.dues')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.dues')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.sarah')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.sarah')}</span>
                     <span className="text-primary">{'///'}</span>
                     {/* Duplicate sequence */}
-                    <span className="text-white">{t('ticker.alex')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.alex')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.match')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.match')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.players')}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.players')}</span>
                     <span className="text-primary">{'///'}</span>
-                    <span className="text-white">{t('ticker.dues')}</span>
-                </motion.div>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.dues')}</span>
+                    <span className="text-primary">{'///'}</span>
+                    <span className="text-zinc-800 dark:text-white">{t('ticker.sarah')}</span>
+                    <span className="text-primary">{'///'}</span>
+                </div>
             </div>
         </section>
+    )
+}
+
+function UnauthenticatedHeroCta({
+    authEnabled,
+    label,
+}: {
+    authEnabled: boolean
+    label: string
+}) {
+    if (authEnabled) {
+        return (
+            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+                    {label}
+                </Button>
+            </SignInButton>
+        )
+    }
+
+    return (
+        <Button asChild size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+            <Link href="/sign-in">{label}</Link>
+        </Button>
     )
 }

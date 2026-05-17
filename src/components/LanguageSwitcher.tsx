@@ -31,15 +31,15 @@ export function LanguageSwitcher() {
             <DropdownMenuContent align="end" className="bg-white dark:bg-zinc-900 border-zinc-200 dark:border-zinc-800">
                 <DropdownMenuItem
                     onClick={() => switchLocale('vi')}
-                    className={`cursor-pointer ${locale === 'vi' ? 'font-bold text-primary' : 'text-zinc-700 dark:text-zinc-300'}`}
+                    className={`cursor-pointer flex items-center gap-2 ${locale === 'vi' ? 'font-bold text-primary' : 'text-zinc-700 dark:text-zinc-300'}`}
                 >
-                    Tiếng Việt
+                    <span aria-hidden="true" className="text-lg">🇻🇳</span> Tiếng Việt
                 </DropdownMenuItem>
                 <DropdownMenuItem
                     onClick={() => switchLocale('en')}
-                    className={`cursor-pointer ${locale === 'en' ? 'font-bold text-primary' : 'text-zinc-700 dark:text-zinc-300'}`}
+                    className={`cursor-pointer flex items-center gap-2 ${locale === 'en' ? 'font-bold text-primary' : 'text-zinc-700 dark:text-zinc-300'}`}
                 >
-                    English
+                    <span aria-hidden="true" className="text-lg">🇺🇸</span> English
                 </DropdownMenuItem>
             </DropdownMenuContent>
         </DropdownMenu>

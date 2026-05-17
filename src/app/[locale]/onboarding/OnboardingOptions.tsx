@@ -1,8 +1,9 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useTransition } from "react"
 import { Button } from "@/components/ui/button"
-import { User, ShieldCheck } from "lucide-react"
+import { User, ShieldCheck, Globe } from "lucide-react"
+import { exploreCommunityAction } from "./actions"
 import { CreateClubForm } from "./CreateClubForm"
 import { SearchClubForm } from "./SearchClubForm"
 
@@ -10,6 +11,13 @@ type FlowState = 'select' | 'create' | 'search'
 
 export function OnboardingOptions() {
     const [flow, setFlow] = useState<FlowState>('select')
+    const [isPending, startTransition] = useTransition()
+
+    const handleExplore = () => {
+        startTransition(() => {
+            exploreCommunityAction()
+        })
+    }
 
     if (flow === 'create') {
         return <CreateClubForm onBack={() => setFlow('select')} />
@@ -20,12 +28,12 @@ export function OnboardingOptions() {
     }
 
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 w-full max-w-4xl mx-auto mt-8 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl mx-auto mt-8 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
             <div className="flex flex-col p-8 bg-white rounded-2xl shadow-sm border border-slate-200 hover:border-blue-300 hover:shadow-md transition-all duration-200 group cursor-pointer" onClick={() => setFlow('search')}>
                 <div className="h-14 w-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-600 mb-6 border border-slate-100 group-hover:bg-blue-50 group-hover:text-blue-600 group-hover:border-blue-100 transition-colors">
                     <User size={28} />
                 </div>
-                <h2 className="text-2xl font-bold font-heading mb-3 text-slate-900">I am a Player</h2>
+                <h2 className="text-xl font-bold font-heading mb-3 text-slate-900">I am a Player</h2>
                 <p className="text-slate-600 font-sans mb-8 leading-relaxed">
                     Search for your team using their club name. Once you find them, request to join and get access to matches, RSVPs, and payments.
                 </p>
@@ -45,7 +53,7 @@ export function OnboardingOptions() {
                 <div className="h-14 w-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-600 mb-6 border border-slate-100 group-hover:bg-green-50 group-hover:text-emerald-600 group-hover:border-green-100 transition-colors">
                     <ShieldCheck size={28} />
                 </div>
-                <h2 className="text-2xl font-bold font-heading mb-3 text-slate-900">I am a Manager</h2>
+                <h2 className="text-xl font-bold font-heading mb-3 text-slate-900">I am a Manager</h2>
                 <p className="text-slate-600 font-sans mb-8 leading-relaxed">
                     Create a new club space. You will become the primary administrator to manage players, organize events, and track team finances.
                 </p>
@@ -56,6 +64,27 @@ export function OnboardingOptions() {
                         onClick={(e) => { e.stopPropagation(); setFlow('create') }}
                     >
                         Create Club Space
+                    </Button>
+                </div>
+            </div>
+
+            <div className="flex flex-col p-8 bg-white rounded-2xl shadow-sm border border-slate-200 hover:border-purple-300 hover:shadow-md transition-all duration-200 group cursor-pointer" onClick={handleExplore}>
+                <div className="h-14 w-14 bg-slate-50 rounded-full flex items-center justify-center text-slate-600 mb-6 border border-slate-100 group-hover:bg-purple-50 group-hover:text-purple-600 group-hover:border-purple-100 transition-colors">
+                    <Globe size={28} />
+                </div>
+                <h2 className="text-xl font-bold font-heading mb-3 text-slate-900">Explore Community</h2>
+                <p className="text-slate-600 font-sans mb-8 leading-relaxed">
+                    Just looking around? Browse the public feeds, explore clubs on the map, and decide on joining a team later.
+                </p>
+                <div className="mt-auto">
+                    <Button
+                        size="lg"
+                        className="w-full text-base font-semibold"
+                        variant="secondary"
+                        disabled={isPending}
+                        onClick={(e) => { e.stopPropagation(); handleExplore() }}
+                    >
+                        {isPending ? "Entering..." : "Free Agent"}
                     </Button>
                 </div>
             </div>

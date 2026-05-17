@@ -14,7 +14,13 @@ import {
     SheetTrigger,
 } from "@/components/ui/sheet"
 
-export function LandingHeader({ userId }: { userId: string | null }) {
+export function LandingHeader({
+    userId,
+    authEnabled = true,
+}: {
+    userId: string | null
+    authEnabled?: boolean
+}) {
     const t = useTranslations('Landing.Header');
 
     return (
@@ -22,7 +28,7 @@ export function LandingHeader({ userId }: { userId: string | null }) {
             initial={{ y: -100 }}
             animate={{ y: 0 }}
             transition={{ duration: 0.6, type: "spring", bounce: 0.2 }}
-            className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-md bg-white/80 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"
+            className="fixed top-0 w-full z-50 transition-all duration-300 backdrop-blur-xl bg-white/95 dark:bg-zinc-950/80 border-b border-zinc-200/50 dark:border-zinc-800/50"
         >
             <div className="container mx-auto px-6 h-20 flex items-center justify-between">
 
@@ -53,15 +59,11 @@ export function LandingHeader({ userId }: { userId: string | null }) {
                     <LanguageSwitcher />
                     <ModeToggle />
                     {userId ? (
-                        <Button asChild className="bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold px-6 rounded-none uppercase tracking-wider text-sm transition-colors border border-transparent hover:border-zinc-200">
+                        <Button asChild className="bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold px-6 rounded-none uppercase tracking-wider text-sm transition-colors border border-transparent hover:border-zinc-200 min-w-[140px]">
                             <Link href="/dashboard">{t('dashboard')}</Link>
                         </Button>
                     ) : (
-                        <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                            <Button className="bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold px-6 rounded-none uppercase tracking-wider text-sm transition-colors border border-transparent hover:border-zinc-200">
-                                {t('getStarted')}
-                            </Button>
-                        </SignInButton>
+                        <UnauthenticatedCta label={t('getStarted')} authEnabled={authEnabled} />
                     )}
                 </div>
 
@@ -96,11 +98,7 @@ export function LandingHeader({ userId }: { userId: string | null }) {
                                         <Link href="/dashboard">{t('dashboard')}</Link>
                                     </Button>
                                 ) : (
-                                    <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                                        <Button size="lg" className="w-full bg-primary text-black hover:bg-white font-bold rounded-none uppercase tracking-wider text-lg transition-colors border border-transparent hover:border-zinc-200">
-                                            {t('getStarted')}
-                                        </Button>
-                                    </SignInButton>
+                                    <UnauthenticatedCta label={t('getStarted')} size="lg" fullWidth authEnabled={authEnabled} />
                                 )}
                             </div>
                         </SheetContent>
@@ -109,5 +107,35 @@ export function LandingHeader({ userId }: { userId: string | null }) {
 
             </div>
         </motion.header>
+    )
+}
+
+function UnauthenticatedCta({
+    label,
+    size,
+    fullWidth = false,
+    authEnabled = true,
+}: {
+    label: string
+    size?: "default" | "lg"
+    fullWidth?: boolean
+    authEnabled?: boolean
+}) {
+    const className = `${fullWidth ? 'w-full ' : 'min-w-[140px] '}bg-primary text-white hover:bg-zinc-900 dark:text-black dark:hover:bg-white font-bold rounded-none uppercase tracking-wider ${size === 'lg' ? 'px-6 text-lg ' : 'px-6 text-sm '}transition-colors border border-transparent hover:border-zinc-200`
+
+    if (authEnabled) {
+        return (
+            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button size={size} className={className}>
+                    {label}
+                </Button>
+            </SignInButton>
+        )
+    }
+
+    return (
+        <Button asChild size={size} className={className}>
+            <Link href="/sign-in">{label}</Link>
+        </Button>
     )
 }

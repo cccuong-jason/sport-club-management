@@ -10,6 +10,15 @@ const UserSchema = new Schema({
   citizenId: String,
   photoUrl: String,
   passwordHash: String,
+  publicLocation: {
+    coordinates: {
+      lat: Number,
+      lng: Number
+    },
+    city: String,
+    country: String
+  },
+  onboardingCompleted: { type: Boolean, default: false },
 }, { timestamps: true })
 
 export type IUser = {
@@ -22,6 +31,15 @@ export type IUser = {
   dateOfBirth?: Date
   citizenId?: string
   photoUrl?: string
+  publicLocation?: {
+    coordinates?: {
+      lat?: number
+      lng?: number
+    }
+    city?: string
+    country?: string
+  }
+  onboardingCompleted?: boolean
 }
 
 const Model = mongoose.models?.User || model('User', UserSchema)
