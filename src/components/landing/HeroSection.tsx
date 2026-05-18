@@ -8,7 +8,13 @@ import Image from 'next/image'
 import { useRef } from 'react'
 import { useTranslations } from 'next-intl'
 
-export function HeroSection({ userId }: { userId: string | null }) {
+export function HeroSection({
+    userId,
+    authEnabled = true,
+}: {
+    userId: string | null
+    authEnabled?: boolean
+}) {
     const sectionRef = useRef<HTMLElement>(null)
     const t = useTranslations('Landing.Hero')
     const { scrollYProgress } = useScroll({
@@ -113,11 +119,7 @@ export function HeroSection({ userId }: { userId: string | null }) {
                                     <Link href="/dashboard">{t('returnToDashboard')}</Link>
                                 </Button>
                             ) : (
-                                <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                                    <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
-                                        {t('getStartedFree')}
-                                    </Button>
-                                </SignInButton>
+                                <UnauthenticatedHeroCta authEnabled={authEnabled} label={t('getStartedFree')} />
                             )}
 
                             <a href="#features" className="text-sm font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 dark:text-zinc-300 dark:hover:text-white transition-colors flex items-center gap-2 group py-2">
@@ -268,5 +270,29 @@ export function HeroSection({ userId }: { userId: string | null }) {
                 </motion.div>
             </div>
         </section>
+    )
+}
+
+function UnauthenticatedHeroCta({
+    authEnabled,
+    label,
+}: {
+    authEnabled: boolean
+    label: string
+}) {
+    if (authEnabled) {
+        return (
+            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+                    {label}
+                </Button>
+            </SignInButton>
+        )
+    }
+
+    return (
+        <Button asChild size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-bold px-8 py-7 text-lg rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20">
+            <Link href="/sign-in">{label}</Link>
+        </Button>
     )
 }

@@ -7,7 +7,13 @@ import Link from 'next/link'
 
 import { useTranslations } from 'next-intl'
 
-export function FinalCta({ userId }: { userId: string | null }) {
+export function FinalCta({
+    userId,
+    authEnabled = true,
+}: {
+    userId: string | null
+    authEnabled?: boolean
+}) {
     const t = useTranslations('Landing.FinalCta')
 
     return (
@@ -37,15 +43,35 @@ export function FinalCta({ userId }: { userId: string | null }) {
                                 <Link href="/dashboard">{t('dashboard')}</Link>
                             </Button>
                         ) : (
-                            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
-                                <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-black px-12 py-8 text-xl rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 uppercase tracking-widest">
-                                    {t('button')}
-                                </Button>
-                            </SignInButton>
+                            <UnauthenticatedFinalCta authEnabled={authEnabled} label={t('button')} />
                         )}
                     </div>
                 </motion.div>
             </div>
         </section>
+    )
+}
+
+function UnauthenticatedFinalCta({
+    authEnabled,
+    label,
+}: {
+    authEnabled: boolean
+    label: string
+}) {
+    if (authEnabled) {
+        return (
+            <SignInButton mode="modal" forceRedirectUrl="/dashboard">
+                <Button size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-black px-12 py-8 text-xl rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 uppercase tracking-widest">
+                    {label}
+                </Button>
+            </SignInButton>
+        )
+    }
+
+    return (
+        <Button asChild size="lg" className="w-full sm:w-auto bg-primary text-black hover:bg-primary/90 font-black px-12 py-8 text-xl rounded-none transition-all duration-300 hover:-translate-y-1 hover:shadow-xl hover:shadow-primary/20 uppercase tracking-widest">
+            <Link href="/sign-in">{label}</Link>
+        </Button>
     )
 }

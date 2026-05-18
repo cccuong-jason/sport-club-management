@@ -11,9 +11,11 @@ import { FinalCta } from '@/components/landing/FinalCta'
 import { Footer } from '@/components/landing/Footer'
 
 import { redirect } from 'next/navigation'
+import { isClerkConfigured } from '@/lib/clerk-env'
 
 export default async function Home() {
-  const { userId } = await auth()
+  const clerkConfigured = isClerkConfigured()
+  const { userId } = clerkConfigured ? await auth() : { userId: null }
 
   if (userId) {
     redirect('/dashboard')
@@ -21,15 +23,15 @@ export default async function Home() {
 
   return (
     <main className="bg-zinc-950 text-white flex flex-col min-h-screen">
-      <LandingHeader userId={userId} />
-      <HeroSection userId={userId} />
+      <LandingHeader userId={userId} authEnabled={clerkConfigured} />
+      <HeroSection userId={userId} authEnabled={clerkConfigured} />
       <SocialProofBar />
       <HowItWorksSection />
       <CapabilitiesSection />
       <FeaturesDeepDive />
       <ShowcasesSection />
       <TestimonialsSection />
-      <FinalCta userId={userId} />
+      <FinalCta userId={userId} authEnabled={clerkConfigured} />
       <Footer />
     </main>
   )
